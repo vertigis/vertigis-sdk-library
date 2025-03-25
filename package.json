@@ -30,7 +30,10 @@
         "eslint-plugin-react-hooks": "~5.2.0",
         "fork-ts-checker-webpack-plugin": "~9.0.2",
         "typescript-eslint": "~8.26.1",
-        "webpack": "~5.98.0"
+        "webpack": "^5.98.0"
+    },
+    "dependenciesComments": {
+        "webpack": "The range of webpack versions allowed MUST ALWAYS include the actual versions used by any compatible instances of the Web SDK or Workflow SDK."
     },
     "devDependencies": {
         "del-cli": "~6.0.0",

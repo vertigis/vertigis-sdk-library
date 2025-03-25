@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "isolatedModules": true,
+        "jsx": "react-jsx",
+        "lib": ["es2022", "dom", "dom.iterable"],
+        "module": "es2022",
+        "moduleResolution": "bundler",
+        "noEmit": true,
+        "noImplicitAny": true,
+        "paths": {
+            "esri/*": ["./node_modules/@arcgis/core/*"]
+        },
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "strictFunctionTypes": false,
+        "sourceMap": true,
+        "stripInternal": true,
+        "target": "es2022"
+    }
+}

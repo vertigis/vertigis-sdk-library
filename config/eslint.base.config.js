@@ -5,7 +5,7 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
-import prettierConfig from "eslint-config-prettier";
+import prettierConfig from "eslint-config-prettier/flat";
 // @ts-expect-error: There are no typings avaliable for this plugin.
 import { flatConfigs as importConfigs } from "eslint-plugin-import";
 import reactPlugin from "eslint-plugin-react";

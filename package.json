@@ -33,7 +33,7 @@
         "webpack": "^5.98.0"
     },
     "dependenciesComments": {
-        "webpack": "The range of webpack versions allowed MUST ALWAYS include the actual versions used by any compatible instances of the Web SDK or Workflow SDK."
+        "webpack": "The range of webpack versions allowed must always include the actual versions used by any compatible instances of the Web SDK or Workflow SDK."
     },
     "devDependencies": {
         "del-cli": "~6.0.0",

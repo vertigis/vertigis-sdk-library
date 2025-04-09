@@ -36,6 +36,7 @@ const baseConfig = defineConfig([
         languageOptions: {
             globals: {
                 ...eslintGlobals.browser,
+                ...eslintGlobals.commonjs,
                 ...eslintGlobals.node,
             },
             ecmaVersion: 2022,

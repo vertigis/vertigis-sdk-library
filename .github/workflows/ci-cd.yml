@@ -1,12 +1,10 @@
 name: CI/CD
 
-on:
+on: 
     push:
         branches:
-            -main
-    pull_request:
-        branches:
-            -main
+            - 'main'
+    workflow_dispatch:
 
 env:
     CI: true

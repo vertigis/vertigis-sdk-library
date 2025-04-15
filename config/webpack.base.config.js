@@ -28,7 +28,6 @@ const baseConfig = {
         extensions: paths.moduleFileExtensions,
     },
     entry: paths.projEntry,
-    externals: [/^@arcgis\/.+$/, /^esri\/.+$/, "react", "react-dom"],
     output: {
         // Technically this shouldn't be needed as we restrict the library to
         // one chunk, but we set this here just to be extra safe against

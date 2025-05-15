@@ -5,8 +5,8 @@ This repo contains a library of configuration and routines that are shared betwe
 
 ## Requirements
 
--   The latest LTS version of [Node.js](https://nodejs.org/en/download/)
--   A code editor of your choice. We recommend [Visual Studio Code](https://code.visualstudio.com/)
+-   The latest LTS version of [Node.js](https://nodejs.org/en/download/).
+-   A code editor of your choice. We recommend [Visual Studio Code](https://code.visualstudio.com/).
 
 
 ## Contributing

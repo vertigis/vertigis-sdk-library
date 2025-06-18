@@ -36,7 +36,7 @@
         "webpack": "The range of webpack versions allowed must always include the actual versions used by any compatible instances of the Web SDK or Workflow SDK."
     },
     "devDependencies": {
-        "conventional-changelog-conventionalcommits": "^9.0.0",
+        "conventional-changelog-conventionalcommits": "7.0.2",
         "del-cli": "~6.0.0",
         "prettier": "~3.5.3",
         "typescript": "^5.3.3"

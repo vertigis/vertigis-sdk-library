@@ -20,8 +20,8 @@
         "prettier": "prettier --write \"**/*.json\" \"**/*.js\""
     },
     "dependencies": {
-        "@eslint/js": "~9.22.0",
-        "eslint": "~9.22.0",
+        "@eslint/js": "^9.31.0",
+        "eslint": "^9.31.0",
         "eslint-config-prettier": "~10.1.1",
         "eslint-import-resolver-typescript": "~4.2.2",
         "eslint-plugin-import": "~2.31.0",
@@ -29,7 +29,7 @@
         "eslint-plugin-react": "~7.37.4",
         "eslint-plugin-react-hooks": "~5.2.0",
         "fork-ts-checker-webpack-plugin": "~9.0.2",
-        "typescript-eslint": "~8.26.1",
+        "typescript-eslint": "^8.38.0",
         "webpack": "^5.98.0"
     },
     "dependenciesComments": {

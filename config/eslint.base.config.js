@@ -46,7 +46,7 @@ const baseConfig = defineConfig([
                 ecmaFeatures: {
                     jsx: true,
                 },
-                projectService: true
+                projectService: true,
             },
         },
         settings: {

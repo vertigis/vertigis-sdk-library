@@ -12,30 +12,48 @@
     "files": [
         "config/*.d.ts",
         "config/*.js",
-        "config/*.json"
+        "config/*.json",
+        "scripts/*.d.ts",
+        "scripts/*.js"
     ],
     "scripts": {
-        "postpack": "del-cli eslint.config.d.ts config/*.d.ts",
+        "postpack": "del-cli eslint.config.d.ts config/*.d.ts scripts/*.d.ts",
         "prepack": "tsc",
         "prettier": "prettier --write \"**/*.json\" \"**/*.js\""
     },
     "dependencies": {
-        "@eslint/js": "~9.22.0",
-        "eslint": "~9.22.0",
+        "@eslint/js": "^9.31.0",
+        "cross-spawn": "^7.0.6",
+        "css-loader": "^7.1.2",
+        "eslint": "^9.31.0",
         "eslint-config-prettier": "~10.1.1",
         "eslint-import-resolver-typescript": "~4.2.2",
         "eslint-plugin-import": "~2.31.0",
         "eslint-plugin-only-warn": "~1.1.0",
         "eslint-plugin-react": "~7.37.4",
         "eslint-plugin-react-hooks": "~5.2.0",
+        "eslint-webpack-plugin": "~5.0.2",
         "fork-ts-checker-webpack-plugin": "~9.0.2",
-        "typescript-eslint": "~8.26.1",
-        "webpack": "^5.98.0"
+        "fs-extra": "^11.3.0",
+        "inquirer": "^12.9.0",
+        "postcss": "^8.5.6",
+        "postcss-loader": "^8.1.1",
+        "postcss-preset-env": "^10.2.4",
+        "style-loader": "^4.0.0",
+        "ts-loader": "^9.5.2",
+        "ts-morph": "^26.0.0",
+        "typescript-eslint": "^8.38.0",
+        "url-loader": "^4.1.1",
+        "webpack": "^5.101.0",
+        "webpack-dev-server": "^5.2.2",
+        "yargs": "^18.0.0"
     },
     "dependenciesComments": {
         "webpack": "The range of webpack versions allowed must always include the actual versions used by any compatible instances of the Web SDK or Workflow SDK."
     },
     "devDependencies": {
+        "@types/cross-spawn": "^6.0.6",
+        "@types/fs-extra": "^11.0.4",
         "conventional-changelog-conventionalcommits": "7.0.2",
         "del-cli": "~6.0.0",
         "prettier": "~3.5.3",

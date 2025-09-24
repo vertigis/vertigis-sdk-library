@@ -8,7 +8,7 @@ import WebpackDevServer from "webpack-dev-server";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import paths from "../config/paths";
+import paths from "../config/paths.js";
 
 /**
  *
@@ -16,20 +16,22 @@ import paths from "../config/paths";
  * @param {"web" | "workflow"} projectType
  */
 const start = (webpackConfig, projectType) => {
-    const isWeb = projectType === "web";
+    /** @type {Record<string, string>} */
+    // @ts-ignore
+    const argv = yargs(hideBin(process.argv)).argv;
 
+    const isWeb = projectType === "web";
     const httpAgent = new http.Agent({ keepAlive: true });
     const httpsAgent = new https.Agent({ keepAlive: true });
-
-    const viewerTarget = process.env.VIEWER_URL || "https://apps.vertigisstudio.com/web";
     const port = process.env.PORT ?? (isWeb ? 3001 : 5000);
-
+    const viewerTarget = process.env.VIEWER_URL || "https://apps.vertigisstudio.com/web";
     const compiler = webpack(webpackConfig);
+    
     /**
      * @type { WebpackDevServer.Configuration }
      */
     const serverConfig = {
-        allowedHosts: "all",
+        allowedHosts: argv["allowed-hosts"] ?? "all",
         client: {
             logging: "none",
             webSocketURL: {
@@ -40,8 +42,8 @@ const start = (webpackConfig, projectType) => {
         headers: {
             "Access-Control-Allow-Origin": "*",
         },
-        // Allow binding to any host (localhost, jdoe-pc.latitudegeo.com, etc).
-        host: "0.0.0.0",
+        // Set this to 0.0.0.0 to allow binding to any host.
+        host: argv["host"] ?? "localhost",
         hot: isWeb,
         open:
             process.env.SMOKE_TEST !== "true" &&

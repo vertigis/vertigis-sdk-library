@@ -125,7 +125,7 @@ const create = (sourceDir, targetName, projectType) => {
     const updateWorkflowTemplateContent = projectPath => {
         const uuid = crypto.randomUUID();
 
-        const filesToUpdate = [path.join(projectPath, "uuid.js")];
+        const filesToUpdate = [path.join(projectPath, "uuid.cjs")];
 
         for (const fileToUpdate of filesToUpdate) {
             const contents = fs.readFileSync(fileToUpdate, { encoding: "utf8" });

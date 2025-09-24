@@ -1,8 +1,11 @@
 // @ts-check
 "use strict";
 
-import chalk, { supportsColor } from "chalk";
-import { webpack } from "webpack";
+import chalk from "chalk";
+import Webpack from "webpack";
+
+const { supportsColor } = chalk;
+const { webpack } = Webpack;
 
 /**
  * SDK project build script.

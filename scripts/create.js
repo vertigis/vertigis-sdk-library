@@ -156,19 +156,6 @@ const create = (sourceDir, targetName, projectType) => {
             })
         );
 
-        // Copy a freshly packaged instance of this repo to install from if this
-        // is a local dev copy. This is done because eslint no longer plays nice
-        // with linked repos.
-        if (process.env.SDK_LOCAL_DEV === "true") {
-            fs.copyFileSync(
-                path.join(sourceDir, `vertigis-${projectType}-sdk-0.0.0-semantically-released.tgz`),
-                path.join(projectPath, `vertigis-${projectType}-sdk.tgz`)
-            );
-            fs.unlinkSync(
-                path.join(sourceDir, `vertigis-${projectType}-sdk-0.0.0-semantically-released.tgz`)
-            );
-        }
-
         // Add SDK and runtime packages.
         checkSpawnSyncResult(
             spawn.sync(
@@ -178,7 +165,7 @@ const create = (sourceDir, targetName, projectType) => {
                     "--save-dev",
                     "--save-exact",
                     process.env.SDK_LOCAL_DEV === "true"
-                        ? path.join(projectPath, `./vertigis-${projectType}-sdk.tgz`)
+                        ? process.cwd()
                         : `@vertigis/${projectType}-sdk@${selfVersion}`,
                     `@vertigis/${projectType}`,
                 ],

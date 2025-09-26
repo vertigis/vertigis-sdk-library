@@ -53,7 +53,8 @@ const start = (webpackConfig, projectType) => {
                 : { target: ["main.js"] }),
         port,
         static: {
-            directory: isWeb ? paths.projPublicDir : "/",
+            publicPath: isWeb ?  undefined : "/",
+            directory: isWeb ? paths.projPublicDir : undefined,
             watch: {
                 ignored: [/node_modules/],
             },

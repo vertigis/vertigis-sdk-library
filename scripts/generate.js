@@ -9,12 +9,12 @@ import paths from "../config/paths.js";
 
 /**
  * SDK project template generation script. Workflow only.
- * 
- * @param {string} sdkPath 
- * 
+ *
+ * @param {string} sdkPath
+ *
  * @returns {Promise<string>}
  */
-const generate = async (sdkPath) => {
+const generate = async sdkPath => {
     const answers = await inquirer.prompt([
         {
             type: "list",
@@ -78,7 +78,9 @@ const generate = async (sdkPath) => {
         fs.readFile(indexPath, "utf-8"),
     ]);
 
-    templateContent = templateContent.replace(/(<name>|Foo)/g, name).replace(/<description>/g, description);
+    templateContent = templateContent
+        .replace(/(<name>|Foo)/g, name)
+        .replace(/<description>/g, description);
 
     // Replace placeholder default export that is used to prevent isolatedModules error.
     indexContent = indexContent.replace("\nexport default {};", "");
@@ -90,7 +92,10 @@ const generate = async (sdkPath) => {
 
     const destFile = path.join(destFolder, destFilename);
 
-    await Promise.all([fs.writeFile(destFile, templateContent, {}), fs.writeFile(indexPath, indexContent)]);
+    await Promise.all([
+        fs.writeFile(destFile, templateContent, {}),
+        fs.writeFile(indexPath, indexContent),
+    ]);
     return destFile;
 };
 

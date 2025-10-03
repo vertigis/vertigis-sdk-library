@@ -13,13 +13,15 @@
         "config/*.d.ts",
         "config/*.js",
         "config/*.json",
+        "lib/*.js",
         "scripts/*.d.ts",
         "scripts/*.js"
     ],
     "scripts": {
-        "postpack": "del-cli eslint.config.d.ts config/*.d.ts scripts/*.d.ts",
+        "postpack": "del-cli eslint.config.d.ts config/*.d.ts  lib/*.d.ts scripts/*.d.ts",
         "prepack": "tsc",
-        "prettier": "prettier --write \"**/*.json\" \"**/*.js\""
+        "prettier": "prettier --write \"**/*.json\" \"**/*.js\"",
+        "test": "node ./test/index.js"
     },
     "dependencies": {
         "@eslint/js": "^9.31.0",
@@ -56,7 +58,10 @@
         "@types/yargs": "^17.0.33",
         "conventional-changelog-conventionalcommits": "7.0.2",
         "del-cli": "~6.0.0",
+        "execa": "~9.6.0",
+        "node-fetch": "~3.3.2",
         "prettier": "~3.5.3",
-        "typescript": "^5.3.3"
+        "typescript": "^5.3.3",
+        "webpack-merge": "^6.0.1"
     }
 }

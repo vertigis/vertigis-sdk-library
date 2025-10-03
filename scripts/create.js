@@ -3,7 +3,7 @@
 
 import chalk from "chalk";
 import crypto from "crypto";
-import fs from "fs"
+import fs from "fs";
 import fsExtra from "fs-extra/esm";
 import path from "path";
 import spawn from "cross-spawn";

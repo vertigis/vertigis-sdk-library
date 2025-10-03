@@ -26,7 +26,7 @@ const start = (webpackConfig, projectType) => {
     const port = process.env.PORT ?? (isWeb ? 3001 : 5000);
     const viewerTarget = process.env.VIEWER_URL || "https://apps.vertigisstudio.com/web";
     const compiler = webpack(webpackConfig);
-    
+
     /**
      * @type { WebpackDevServer.Configuration }
      */
@@ -53,7 +53,7 @@ const start = (webpackConfig, projectType) => {
                 : { target: ["main.js"] }),
         port,
         static: {
-            publicPath: isWeb ?  undefined : "/",
+            publicPath: isWeb ? undefined : "/",
             directory: isWeb ? paths.projPublicDir : undefined,
             watch: {
                 ignored: [/node_modules/],

@@ -13,7 +13,7 @@ process.env.SMOKE_TEST = "true";
 const sdkDirectory = "test/sdk";
 
 const dirName = path.dirname(fileURLToPath(import.meta.url));
-const sdkPath = path.join(dirName, "../test/sdk");
+const sdkPath = path.join(dirName, "../sdk");
 const scriptsPath = path.join(sdkPath, "package/scripts");
 const configPath = path.join(sdkPath, "package/config");
 
@@ -23,6 +23,7 @@ async function downloadSdk() {
     );
 
     await $`mkdir ${sdkDirectory}`;
+    // Change this before committing, provide dev instruction in README
     await $`npm pack ../vertigis-${process.env.SDK_PLATFORM}-sdk --pack-destination ${sdkDirectory}`
         .pipe`tr -d [:space:]`.pipe`xargs -I % tar -xzf ${sdkDirectory}/% -C ${sdkDirectory}`;
 }
@@ -56,7 +57,7 @@ async function repathImports() {
     );
 
     // The testing script is run directly, not imported.
-    const testFilePath = path.join(sdkPath, "package/test/e2e/index.js");
+    const testFilePath = path.join(sdkPath, "package/test/index.js");
     const testFile = await fs.readFile(testFilePath, "utf8");
     const repathedTestFile = testFile.replace("node_modules/@vertigis/sdk-library", "../../..");
     await fs.writeFile(testFilePath, repathedTestFile);
@@ -70,13 +71,13 @@ async function executeTests() {
         node: true,
         stderr: "inherit",
         stdout: "inherit",
-    })`test/e2e/index.js`;
+    })`test/index.js`;
 
     console.log("\nSuccess!");
 }
 
 async function cleanup() {
-    console.log("\nCleaning up...");
+    console.log("\nCleaning up SDK folder...");
     await fs.rm(sdkPath, { recursive: true });
     console.log("Done cleaning.");
 }

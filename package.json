@@ -21,7 +21,9 @@
         "postpack": "del-cli eslint.config.d.ts config/*.d.ts  lib/*.d.ts scripts/*.d.ts",
         "prepack": "tsc",
         "prettier": "prettier --write \"**/*.json\" \"**/*.js\"",
-        "test": "node ./test/index.js"
+        "test": "npm run test:unit && npm run test:e2e",
+        "test:e2e": "node ./test/e2e/index.js",
+        "test:unit": "jest"
     },
     "dependencies": {
         "@eslint/js": "^9.31.0",
@@ -31,6 +33,7 @@
         "eslint-config-prettier": "~10.1.1",
         "eslint-import-resolver-typescript": "~4.2.2",
         "eslint-plugin-import": "~2.31.0",
+        "eslint-plugin-jest": "~29.0.1",
         "eslint-plugin-only-warn": "~1.1.0",
         "eslint-plugin-react": "~7.37.4",
         "eslint-plugin-react-hooks": "~5.2.0",
@@ -42,7 +45,7 @@
         "postcss-preset-env": "^10.2.4",
         "style-loader": "^4.0.0",
         "ts-loader": "^9.5.2",
-        "ts-morph": "^26.0.0",
+        "ts-morph": "^27.0.0",
         "typescript-eslint": "^8.38.0",
         "url-loader": "^4.1.1",
         "webpack": "^5.101.0",
@@ -53,14 +56,20 @@
         "webpack": "The range of webpack versions allowed must always include the actual versions used by any compatible instances of the Web SDK or Workflow SDK."
     },
     "devDependencies": {
+        "@swc/core": "^1.13.5",
+        "@swc/jest": "^0.2.39",
         "@types/cross-spawn": "^6.0.6",
         "@types/fs-extra": "^11.0.4",
+        "@types/jest": "^30.0.0",
         "@types/yargs": "^17.0.33",
+        "@vertigis/workflow": "^5.47.0",
         "conventional-changelog-conventionalcommits": "7.0.2",
         "del-cli": "~6.0.0",
         "execa": "~9.6.0",
+        "jest": "^30.2.0",
         "node-fetch": "~3.3.2",
         "prettier": "~3.5.3",
+        "p-retry": "^7.0.0",
         "typescript": "^5.3.3",
         "webpack-merge": "^6.0.1"
     }

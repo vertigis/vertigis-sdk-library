@@ -13,6 +13,8 @@ import { pathToFileURL } from "url";
 /** @type {import("execa").ResultPromise} */
 let subprocess;
 
+let success = false;
+
 /** @returns {Promise<string>} */
 async function getProjectUuid() {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -50,6 +52,20 @@ function killSubprocess() {
     if (subprocess && !subprocess.killed) {
         subprocess.kill();
         subprocess = undefined;
+    }
+}
+
+/**
+ * 
+ * @param {import("execa").ResultPromise<import("execa").Options>} subprocess 
+ */
+async function awaitSubprocess(subprocess) {
+    try {
+        await subprocess;
+    } catch (error) {
+        if (!success) {
+            throw error;
+        }
     }
 }
 
@@ -91,31 +107,6 @@ async function testBuildProject() {
             .includes("define("),
         true,
         "main.js should be an AMD module (build)"
-    );
-}
-
-async function testStartProject() {
-    subprocess = runNpmScript(["start"], { cwd: process.env.TEST_PROJECT_PATH, stdio: "ignore" });
-
-    await new Promise(resolve => setTimeout(resolve, 50000));
-
-    // The dev server uses a self signed cert which the `https` module won't allow by default.
-    const unsafeAgent = new https.Agent({ rejectUnauthorized: false });
-
-    await pRetry(
-        async () => {
-            const response = await fetch("https://localhost:5000/main.js", {
-                agent: unsafeAgent,
-            });
-            assert.strictEqual(
-                (await response.text()).includes("define("),
-                true,
-                "main.js should be an AMD module (start)"
-            );
-        },
-        {
-            maxRetryTime: 10000,
-        }
     );
 }
 
@@ -343,17 +334,50 @@ async function testActivityPackMetadataGeneration() {
     });
 }
 
-/**
- * @param {fs.PathLike} path
- */
-function rmdir(path) {
-    fs.rmSync(path, { recursive: true });
+async function testStartProject() {
+    subprocess = runNpmScript(["start"], { cwd: process.env.TEST_PROJECT_PATH });
+   
+    // Wait for webpack-dev-server to start. It can take some time!
+    const waitForServer = new Promise((resolve) => {
+        subprocess.stdout.on("data", (/** @type {string} */ data) => {
+            if (data.includes("No errors found.")) {
+                resolve();
+            }
+        });
+    });
+    await waitForServer;
+
+    // The dev server uses a self signed cert which the `https` module won't allow by default.
+    const unsafeAgent = new https.Agent({ rejectUnauthorized: false });
+
+    await pRetry(
+        async () => {
+            let response;
+            try {
+                response = await fetch("https://localhost:5000/main.js", {
+                    agent: unsafeAgent,
+                });
+            } catch (error) {
+                assert.fail();                
+            }
+            assert.strictEqual(
+                (await response?.text())?.includes("define("),
+                true,
+                "main.js should be an AMD module (start)"
+            );
+        }
+    );
+
+    // Killing this subprocess and shutting down the server will throw an error,
+    // so make sure it gets handled.
+    awaitSubprocess(subprocess);
 }
 
+
 function cleanup() {
-    console.log("\nCleaning up...");
+    console.log("\nCleaning up test folder and killing subprocess...");
     killSubprocess();
-    rmdir(process.env.TEST_PROJECT_PATH);
+    fs.rmSync(process.env.TEST_PROJECT_PATH, { recursive: true });
     console.log("Done cleaning.");
 }
 
@@ -369,6 +393,7 @@ try {
 
     await testStartProject();
 
+    success = true;
     console.log("\n\nAll tests passed!\n");
 } catch (error) {
     console.error("\n\nTest failed.\n");

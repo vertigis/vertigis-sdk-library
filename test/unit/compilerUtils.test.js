@@ -1,6 +1,6 @@
 import { Project } from "ts-morph";
-import { getProjectMetadata } from "../../lib/compilerUtils";
-import InvalidMetatagsError from "../../lib/InvalidMetatagsError";
+import { getProjectMetadata } from "../../lib/workflow/compilerUtils";
+import InvalidMetatagsError from "../../lib/workflow/InvalidMetatagsError";
 
 // Maintain a single instance of a project to avoid the large cost of
 // initialization (~3s).
@@ -117,7 +117,10 @@ describe("getProjectMetadata", () => {
             }
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(activities).toMatchSnapshot();
         });
@@ -141,7 +144,10 @@ describe("getProjectMetadata", () => {
             }
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(activities[0].category).toBe("Custom Activities");
             expect(activities[0].displayName).toBe("Test Activity");
@@ -163,9 +169,9 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
-            expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
-                InvalidMetatagsError
-            );
+            expect(() =>
+                getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)
+            ).toThrow(InvalidMetatagsError);
 
             // Activity: Supported & Unsupported Apps
             activitySource = `
@@ -180,9 +186,9 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
-            expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
-                InvalidMetatagsError
-            );
+            expect(() =>
+                getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)
+            ).toThrow(InvalidMetatagsError);
 
             // Input: Client & Server tags
             activitySource = `
@@ -201,9 +207,9 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
-            expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
-                InvalidMetatagsError
-            );
+            expect(() =>
+                getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)
+            ).toThrow(InvalidMetatagsError);
 
             // Input: Supported & Unsupported Apps
             activitySource = `
@@ -222,9 +228,9 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
-            expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
-                InvalidMetatagsError
-            );
+            expect(() =>
+                getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)
+            ).toThrow(InvalidMetatagsError);
 
             // Output: Client & Server tags
             activitySource = `
@@ -243,9 +249,9 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
-            expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
-                InvalidMetatagsError
-            );
+            expect(() =>
+                getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)
+            ).toThrow(InvalidMetatagsError);
 
             // Input: Supported & Unsupported Apps
             activitySource = `
@@ -264,9 +270,9 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
-            expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
-                InvalidMetatagsError
-            );
+            expect(() =>
+                getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)
+            ).toThrow(InvalidMetatagsError);
         });
 
         it("unwraps `Promise<T>` output type to `T`", () => {
@@ -287,7 +293,10 @@ describe("getProjectMetadata", () => {
             }
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(activities[0].outputs.output1.typeName).toBe("string");
         });
@@ -306,7 +315,10 @@ describe("getProjectMetadata", () => {
             }
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(Object.keys(activities[0].outputs)).toHaveLength(0);
         });
@@ -325,7 +337,10 @@ describe("getProjectMetadata", () => {
             }
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(Object.keys(activities[0].outputs)).toHaveLength(0);
         });
@@ -352,7 +367,10 @@ describe("getProjectMetadata", () => {
             }
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(activities[0].inputs.input1.typeName).toBe("Promise<string>");
             expect(activities[0].outputs.output1.typeName).toBe("Promise<boolean>");
@@ -378,7 +396,10 @@ describe("getProjectMetadata", () => {
             }
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(activities[0].inputs.input1.typeName).toBe(
                 `{
@@ -405,7 +426,10 @@ describe("getProjectMetadata", () => {
             }
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(activities[0].inputs.input1.typeName).toBe(`"foo" | "bar" | string`);
         });
@@ -429,7 +453,10 @@ describe("getProjectMetadata", () => {
             }
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(activities[0].inputs.input1.typeName).toBe("MyInterface");
         });
@@ -459,13 +486,18 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
-            sourceFiles.push(project.createSourceFile("activities/TestActivity.ts", activitySource));
+            sourceFiles.push(
+                project.createSourceFile("activities/TestActivity.ts", activitySource)
+            );
 
             const indexSource = `
             export * from "./activities/TestActivity";
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("index.ts", indexSource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("index.ts", indexSource),
+                uuid
+            );
 
             expect(activities[0].inputs.input1.typeName).toBe("MyInterface");
         });
@@ -497,13 +529,18 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
-            sourceFiles.push(project.createSourceFile("c:/temp/activities/TestActivity.ts", activitySource));
+            sourceFiles.push(
+                project.createSourceFile("c:/temp/activities/TestActivity.ts", activitySource)
+            );
 
             const indexSource = `
             export * from "./activities/TestActivity";
             `;
 
-            const { activities } = getProjectMetadata(createSourceFile("c:/temp/index.ts", indexSource), uuid);
+            const { activities } = getProjectMetadata(
+                createSourceFile("c:/temp/index.ts", indexSource),
+                uuid
+            );
 
             expect(activities[0].inputs.input1.typeName).toBe("MyInterface");
         });
@@ -590,7 +627,10 @@ describe("getProjectMetadata", () => {
             };
             `;
 
-            const { elements } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { elements } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(elements).toMatchSnapshot();
         });
@@ -624,7 +664,10 @@ describe("getProjectMetadata", () => {
             };
             `;
 
-            const { elements } = getProjectMetadata(createSourceFile("index.ts", activitySource), uuid);
+            const { elements } = getProjectMetadata(
+                createSourceFile("index.ts", activitySource),
+                uuid
+            );
 
             expect(elements.map(element => element.inputs)).toEqual([{}, {}, {}]);
         });
@@ -641,7 +684,9 @@ describe("getProjectMetadata", () => {
             };
             `;
 
-            expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
+            expect(() =>
+                getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)
+            ).toThrow(
                 `"component" property of element registration isn't a function or class component.`
             );
         });
@@ -660,9 +705,9 @@ describe("getProjectMetadata", () => {
             };
             `;
 
-            expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
-                'Must directly assign value to "id" property of element registration'
-            );
+            expect(() =>
+                getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)
+            ).toThrow('Must directly assign value to "id" property of element registration');
         });
 
         it("throws error for incorrect type of `id` value", () => {
@@ -677,9 +722,9 @@ describe("getProjectMetadata", () => {
             };
             `;
 
-            expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
-                `Value of "id" property of element registration must be a string literal.`
-            );
+            expect(() =>
+                getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)
+            ).toThrow(`Value of "id" property of element registration must be a string literal.`);
         });
     });
 });

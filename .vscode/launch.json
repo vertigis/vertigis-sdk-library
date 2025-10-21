@@ -8,25 +8,21 @@
             "type": "node",
             "request": "launch",
             "name": "Debug unit tests",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "runtimeArgs": ["run-script", "test:unit", "--", "--runInBand"],
             "runtimeExecutable": "npm",
             "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Debug end to end tests",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "runtimeArgs": ["run-script", "test:e2e", "--", "--runInBand"],
             "runtimeExecutable": "npm",
             "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
+            "internalConsoleOptions": "neverOpen"
         }
     ]
 }

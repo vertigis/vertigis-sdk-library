@@ -23,7 +23,7 @@ async function downloadSdk() {
     );
 
     await $`mkdir ${sdkDirectory}`;
-    // Change this before committing, provide dev instruction in README
+    // TODO: Change this before committing, provide dev instruction in README
     await $`npm pack ../vertigis-${process.env.SDK_PLATFORM}-sdk --pack-destination ${sdkDirectory}`
         .pipe`tr -d [:space:]`.pipe`xargs -I % tar -xzf ${sdkDirectory}/% -C ${sdkDirectory}`;
 }
@@ -77,11 +77,12 @@ async function executeTests() {
 }
 
 async function cleanup() {
-    console.log("\nCleaning up SDK folder...");
+    console.log(`\nCleaning up ${process.env.SDK_PLATFORM} sdk folder...`);
     await fs.rm(sdkPath, { recursive: true });
     console.log("Done cleaning.");
 }
 
+// Run the Workflow SDK tests.
 process.env.SDK_PLATFORM = "workflow";
 
 try {
@@ -95,24 +96,18 @@ try {
     process.exit(1);
 }
 
-// Run Web tests.
-// try {
-//     await downloadSdk("web");
-//     await repathImports();
-//     await executeTests("web");
-// } catch (error) {
-//     console.log(error);
-//     cleanup();
-//     process.exit(1);
-// }
+// Run the Web SDK tests.
+process.env.SDK_PLATFORM = "web";
 
-// try {
-//     cleanup();
-// } catch {
-//     console.error(
-//         "\n\nFailed to clean up. You may need to remove the `test/sdk` directory manually.\n"
-//     );
-//     process.exit(1);
-// }
+try {
+    await downloadSdk();
+    await repathImports();
+    await executeTests();
+    await cleanup();
+} catch (error) {
+    console.log(error);
+    await cleanup();
+    process.exit(1);
+}
 
 process.exit();

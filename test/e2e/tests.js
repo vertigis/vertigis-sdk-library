@@ -7,6 +7,7 @@ import fetch from "node-fetch";
 import * as fs from "fs";
 import https from "https";
 import path from "path";
+import { chromium } from "playwright-chromium";
 import pRetry from "p-retry";
 import { pathToFileURL } from "url";
 
@@ -27,7 +28,7 @@ async function getProjectUuid() {
  * @param {import("execa").Options} [opts]
  */
 function runNpmScript(args, opts) {
-    console.log(`\nExecuting CLI script: ${args.join(" ")}\n`);
+    console.log(`\nExecuting ${process.env.SDK_PLATFORM}-sdk CLI script: ${args.join(" ")}\n`);
     const scriptProcess = execa(
         path.join(process.env.ROOT_DIRECTORY, `bin/vertigis-${process.env.SDK_PLATFORM}-sdk.js`),
         args,
@@ -56,8 +57,8 @@ function killSubprocess() {
 }
 
 /**
- * 
- * @param {import("execa").ResultPromise<import("execa").Options>} subprocess 
+ *
+ * @param {import("execa").ResultPromise<import("execa").Options>} subprocess
  */
 async function awaitSubprocess(subprocess) {
     try {
@@ -88,8 +89,10 @@ async function testCreateProject() {
         "Failed to detect existing directory"
     );
 
-    const projectUuid = await getProjectUuid();
-    assert.strictEqual(projectUuid.length, 36, "Create project should populate uuid");
+    if (process.env.SDK_PLATFORM === "workflow") {
+        const projectUuid = await getProjectUuid();
+        assert.strictEqual(projectUuid.length, 36, "Create project should populate uuid");
+    }
 }
 
 // We assume the project was successfully created to run the following tests.
@@ -336,43 +339,62 @@ async function testActivityPackMetadataGeneration() {
 
 async function testStartProject() {
     subprocess = runNpmScript(["start"], { cwd: process.env.TEST_PROJECT_PATH });
-   
+
     // Wait for webpack-dev-server to start. It can take some time!
-    const waitForServer = new Promise((resolve) => {
+    await new Promise(resolve => {
         subprocess.stdout.on("data", (/** @type {string} */ data) => {
+            // If compilation is going to fail we should have exited the tests
+            // already at the build step.
             if (data.includes("No errors found.")) {
                 resolve();
             }
         });
     });
-    await waitForServer;
 
-    // The dev server uses a self signed cert which the `https` module won't allow by default.
-    const unsafeAgent = new https.Agent({ rejectUnauthorized: false });
+    const testStartWorkflow = async () => {
+        // The dev server uses a self signed cert which the `https` module won't allow by default.
+        const unsafeAgent = new https.Agent({ rejectUnauthorized: false });
 
-    await pRetry(
-        async () => {
+        await pRetry(async () => {
             let response;
             try {
                 response = await fetch("https://localhost:5000/main.js", {
                     agent: unsafeAgent,
                 });
-            } catch (error) {
-                assert.fail();                
+            } catch {
+                assert.fail();
             }
             assert.strictEqual(
                 (await response?.text())?.includes("define("),
                 true,
                 "main.js should be an AMD module (start)"
             );
-        }
-    );
+        });
+    };
+
+    const testStartWeb = async () => {
+        await pRetry(async () => {
+            const browser = await chromium.launch();
+            try {
+                const page = await browser.newPage();
+                await page.goto("http://localhost:3001");
+                const frame = page.frame("viewer");
+                await frame?.waitForSelector("text=Points of Interest");
+            } catch {
+                assert.fail();
+            } finally {
+                await browser.close();
+            }
+        });
+    };
+
+    await (process.env.SDK_PLATFORM === "web" ? testStartWeb : testStartWorkflow)();
 
     // Killing this subprocess and shutting down the server will throw an error,
     // so make sure it gets handled.
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     awaitSubprocess(subprocess);
 }
-
 
 function cleanup() {
     console.log("\nCleaning up test folder and killing subprocess...");

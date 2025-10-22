@@ -19,8 +19,7 @@ async function downloadSdk() {
     );
 
     await $`mkdir ${sdkDirectory}`;
-    // TODO: Change this before committing, provide dev instruction in README
-    await $`npm pack ../vertigis-${process.env.SDK_PLATFORM}-sdk --pack-destination ${sdkDirectory}`
+    await $`npm pack @vertigis/${process.env.SDK_PLATFORM}-sdk --pack-destination ${sdkDirectory}`
         .pipe`tr -d [:space:]`.pipe`xargs -I % tar -xzf ${sdkDirectory}/% -C ${sdkDirectory}`;
 }
 

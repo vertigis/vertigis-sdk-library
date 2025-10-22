@@ -488,7 +488,7 @@ try {
         await testActivityPackMetadataGeneration();
     }
 
-    // await testStartProject();
+    await testStartProject();
 
     success = true;
     console.log("\n\nAll tests passed!\n");

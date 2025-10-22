@@ -73,8 +73,10 @@ const upgrade = async (sdkPath, projectType) => {
         "utf8"
     );
 
-    console.info("Running npm install...");
-    spawn.sync("npm", ["install"]);
+    if (!process.env.SMOKE_TEST) {
+        console.info("Running npm install...");
+        spawn.sync("npm", ["install"]);
+    }
 };
 
 export default upgrade;

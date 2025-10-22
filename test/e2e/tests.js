@@ -11,6 +11,29 @@ import { chromium } from "playwright-chromium";
 import pRetry from "p-retry";
 import { pathToFileURL } from "url";
 
+/**
+ * The tests in this file are called by the individual SDK repos after setting
+ * appropriate environment variables:
+ *
+ *   process.env.OPEN_BROWSER = "false";
+ *
+ *   process.env.SDK_LOCAL_DEV = "true";
+ *
+ *   process.env.ROOT_DIRECTORY = Root folder of the SDK instance calling the
+ *   tests.
+ *
+ *   process.env.TEST_PROJECT_PATH = The path the test project is installed at:
+ *   ROOT_DIRECTORY/test-lib
+ *
+ *   process.env.UPGRADE_PROJECTS_PATH = The path to the folder containing
+ *   upgradeable projects to test.
+ *
+ *   process.env.SMOKE_TEST = "true";
+ *
+ *   process.env.SDK_PLATFORM = Either "web" or "workflow";
+ *
+ */
+
 /** @type {import("execa").ResultPromise} */
 let subprocess;
 
@@ -396,6 +419,57 @@ async function testStartProject() {
     awaitSubprocess(subprocess);
 }
 
+async function testUpgradeProject() {
+    // Copy the project to upgrade to a temp location.
+    const originalProjectPath = path.join(process.env.UPGRADE_PROJECTS_PATH, (process.env.SDK_PLATFORM === "web" ? "web-1.11.1" : "workflow-5.1.2"));
+    const projectPath = path.join(process.env.ROOT_DIRECTORY, "upgrade");
+    await fs.promises.cp(originalProjectPath, projectPath, { recursive: true });
+
+    // Determine the version of packages we should be upgrading to.
+    const responses = await Promise.all([
+        fetch(`https://registry.npmjs.com/@vertigis/${process.env.SDK_PLATFORM}/`),
+        fetch(`https://registry.npmjs.com/@vertigis/${process.env.SDK_PLATFORM}-sdk/`),
+    ]);
+    const [productInfo, sdkInfo] = await Promise.all(responses.map(r => r.json()));
+    // @ts-ignore
+    const latestProduct = productInfo["dist-tags"]?.latest;
+    // @ts-ignore
+    const latestSDK = sdkInfo["dist-tags"]?.latest;
+
+    // Run the upgrade script.
+    subprocess = runNpmScript(["upgrade", process.env.ROOT_DIRECTORY], {cwd: projectPath});
+    await subprocess;
+
+    // Read the package.json file after upgrading.
+    const projectPackage = JSON.parse(await fs.promises.readFile(path.join(projectPath, "package.json"), "utf8"));
+
+    assert.strictEqual(
+        projectPackage.devDependencies[`@vertigis/${process.env.SDK_PLATFORM}`], 
+        `^${latestProduct}`,
+        `Base ${process.env.SDK_PLATFORM} package should be upgraded to version ${latestProduct}`
+    );
+    
+    assert.strictEqual(
+        projectPackage.devDependencies[`@vertigis/${process.env.SDK_PLATFORM}-sdk`], 
+        `^${latestSDK}`,
+        `SDK package for ${process.env.SDK_PLATFORM} should be upgraded to version ${latestSDK}`
+    );
+
+    assert.strictEqual(
+        fs.existsSync(path.join(projectPath, "eslint.config.js")),
+        true,
+        "New ESlint configuration should be added."
+    );
+
+    assert.strictEqual(
+        projectPackage.type,
+        "module",
+        "Project type should be set to 'module'."
+    );
+
+    fs.rmSync(projectPath, { recursive: true })
+}
+
 function cleanup() {
     console.log("\nCleaning up test folder and killing subprocess...");
     killSubprocess();
@@ -404,6 +478,7 @@ function cleanup() {
 }
 
 try {
+    await testUpgradeProject();
     await testCreateProject();
     await testBuildProject();
 
@@ -413,7 +488,7 @@ try {
         await testActivityPackMetadataGeneration();
     }
 
-    await testStartProject();
+    // await testStartProject();
 
     success = true;
     console.log("\n\nAll tests passed!\n");

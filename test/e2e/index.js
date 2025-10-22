@@ -6,10 +6,6 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 
-process.env.OPEN_BROWSER = "false";
-process.env.SDK_LOCAL_DEV = "true";
-process.env.SMOKE_TEST = "true";
-
 const sdkDirectory = "test/sdk";
 
 const dirName = path.dirname(fileURLToPath(import.meta.url));
@@ -59,7 +55,7 @@ async function repathImports() {
     // The testing script is run directly, not imported.
     const testFilePath = path.join(sdkPath, "package/test/index.js");
     const testFile = await fs.readFile(testFilePath, "utf8");
-    const repathedTestFile = testFile.replace("node_modules/@vertigis/sdk-library", "../../..");
+    const repathedTestFile = testFile.replaceAll("node_modules/@vertigis/sdk-library", "../../..");
     await fs.writeFile(testFilePath, repathedTestFile);
 }
 

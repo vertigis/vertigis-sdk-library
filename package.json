@@ -54,9 +54,6 @@
         "webpack-dev-server": "^5.2.2",
         "yargs": "^18.0.0"
     },
-    "dependenciesComments": {
-        "webpack": "The range of webpack versions allowed must always include the actual versions used by any compatible instances of the Web SDK or Workflow SDK."
-    },
     "devDependencies": {
         "@swc/core": "^1.13.5",
         "@swc/jest": "^0.2.39",

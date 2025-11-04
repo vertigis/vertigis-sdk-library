@@ -48,6 +48,11 @@ const upgrade = async (sdkPath, projectType) => {
     projectPackage.devDependencies[`@vertigis/${projectType}`] = `^${latestProduct}`;
     projectPackage.devDependencies[`@vertigis/${projectType}-sdk`] = `^${latestSDK}`;
 
+    // This is the current minimum version of typescript required by the SDK
+    // build system. If you change it, also change the upgrade test to check for
+    // the new version.
+    projectPackage.devDependencies.typescript = "^5.4.0";
+
     // Check for old eslint configuration and fix it.
     if (fs.existsSync(".eslintrc.js") && !fs.existsSync("eslint.config.js")) {
         console.info("Adding new default configuration for eslint to 'eslint.config.js'.");

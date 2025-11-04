@@ -1,6 +1,4 @@
 // @ts-check
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use strict";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
@@ -46,7 +44,7 @@ const baseConfig = defineConfig([
                 ecmaFeatures: {
                     jsx: true,
                 },
-                projectService: true
+                projectService: true,
             },
         },
         settings: {

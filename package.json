@@ -12,33 +12,64 @@
     "files": [
         "config/*.d.ts",
         "config/*.js",
-        "config/*.json"
+        "config/*.json",
+        "lib",
+        "scripts/*.d.ts",
+        "scripts/*.js"
     ],
     "scripts": {
-        "postpack": "del-cli eslint.config.d.ts config/*.d.ts",
+        "postpack": "del-cli eslint.config.d.ts config/*.d.ts  lib/*.d.ts scripts/*.d.ts",
         "prepack": "tsc",
-        "prettier": "prettier --write \"**/*.json\" \"**/*.js\""
+        "prettier": "prettier --write \"**/*.json\" \"**/*.js\"",
+        "test": "npm run test:unit && npm run test:e2e",
+        "test:e2e": "node ./test/e2e/index.js",
+        "test:unit": "jest"
     },
     "dependencies": {
         "@eslint/js": "^9.31.0",
+        "cross-spawn": "^7.0.6",
+        "css-loader": "^7.1.2",
         "eslint": "^9.31.0",
         "eslint-config-prettier": "~10.1.1",
         "eslint-import-resolver-typescript": "~4.2.2",
         "eslint-plugin-import": "~2.31.0",
+        "eslint-plugin-jest": "~29.0.1",
         "eslint-plugin-only-warn": "~1.1.0",
         "eslint-plugin-react": "~7.37.4",
         "eslint-plugin-react-hooks": "~5.2.0",
         "fork-ts-checker-webpack-plugin": "~9.0.2",
+        "fs-extra": "^11.3.0",
+        "html-webpack-plugin": "^5.6.4",
+        "inquirer": "^12.9.0",
+        "playwright-chromium": "^1.56.1",
+        "postcss": "^8.5.6",
+        "postcss-loader": "^8.1.1",
+        "postcss-preset-env": "^10.2.4",
+        "style-loader": "^4.0.0",
+        "ts-loader": "^9.5.2",
+        "ts-morph": "^27.0.0",
         "typescript-eslint": "^8.38.0",
-        "webpack": "^5.98.0"
-    },
-    "dependenciesComments": {
-        "webpack": "The range of webpack versions allowed must always include the actual versions used by any compatible instances of the Web SDK or Workflow SDK."
+        "url-loader": "^4.1.1",
+        "webpack": "^5.101.0",
+        "webpack-dev-server": "^5.2.2",
+        "yargs": "^18.0.0"
     },
     "devDependencies": {
+        "@swc/core": "^1.13.5",
+        "@swc/jest": "^0.2.39",
+        "@types/cross-spawn": "^6.0.6",
+        "@types/fs-extra": "^11.0.4",
+        "@types/jest": "^30.0.0",
+        "@types/yargs": "^17.0.33",
+        "@vertigis/workflow": "^5.47.0",
         "conventional-changelog-conventionalcommits": "7.0.2",
         "del-cli": "~6.0.0",
+        "execa": "~9.6.0",
+        "jest": "^30.2.0",
+        "node-fetch": "~3.3.2",
         "prettier": "~3.5.3",
-        "typescript": "^5.3.3"
+        "p-retry": "^7.0.0",
+        "typescript": "^5.3.3",
+        "webpack-merge": "^6.0.1"
     }
 }

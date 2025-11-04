@@ -8,7 +8,7 @@
         "isolatedModules": true,
         "jsx": "react-jsx",
         "lib": ["es2022", "dom", "dom.iterable"],
-        "module": "es2022",
+        "module": "preserve",
         "moduleResolution": "bundler",
         "noEmit": true,
         "noImplicitAny": true,

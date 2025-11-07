@@ -15,10 +15,11 @@
         "config/*.json",
         "lib",
         "scripts/*.d.ts",
-        "scripts/*.js"
+        "scripts/*.js",
+        "test/e2e"
     ],
     "scripts": {
-        "postpack": "del-cli eslint.config.d.ts config/*.d.ts  lib/*.d.ts scripts/*.d.ts",
+        "postpack": "del-cli *.d.ts config/*.d.ts  lib/**/*.d.ts scripts/*.d.ts test/**/*.d.ts",
         "prepack": "tsc",
         "prettier": "prettier --write \"**/*.json\" \"**/*.js\"",
         "test": "npm run test:unit && npm run test:e2e",

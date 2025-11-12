@@ -144,12 +144,12 @@ async function testGenerate() {
             .trim();
 
     const createDataCallback =
-        (/** @type {{ endsWith: string; write: string; matched?: boolean; }[]} */ matches) =>
+        (/** @type {{ contains: string; write: string; matched?: boolean; }[]} */ matches) =>
         (/** @type {string} */ data) => {
             const cleanData = cleanStdoutData(data);
 
             for (const match of matches) {
-                if (!match.matched && cleanData.endsWith(match.endsWith)) {
+                if (!match.matched && cleanData.includes(match.contains)) {
                     subprocess.stdin.write(match.write);
                     // Because of the nature of inquirer clearing and reprinting
                     // lines in the console, we can receive data events that end
@@ -168,16 +168,16 @@ async function testGenerate() {
         createDataCallback([
             // Being asked about what we'd like to create (activity or form element)
             {
-                endsWith: "Form Element",
+                contains: "ActivityForm Element",
                 // Hit enter on default selected item (activity)
                 write: "\n",
             },
             {
-                endsWith: "What is the activity name",
+                contains: "What is the activity name",
                 write: "FooName\n",
             },
             {
-                endsWith: "What is the description",
+                contains: "What is the description",
                 write: "FooName description\n",
             },
         ])
@@ -243,16 +243,16 @@ async function testGenerate() {
         createDataCallback([
             // Being asked about what we'd like to create (activity or form element)
             {
-                endsWith: "Form Element",
+                contains: "ActivityForm Element",
                 // Down arrow + enter (select form element option)
                 write: "\u001b[B\n",
             },
             {
-                endsWith: "What is the element name",
+                contains: "What is the element name",
                 write: "BarName\n",
             },
             {
-                endsWith: "What is the description",
+                contains: "What is the description",
                 write: "BarName description\n",
             },
         ])

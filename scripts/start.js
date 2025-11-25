@@ -4,6 +4,7 @@
 import * as http from "http";
 import * as https from "https";
 import webpack from "webpack";
+import merge from "webpack-merge";
 import WebpackDevServer from "webpack-dev-server";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
@@ -95,7 +96,7 @@ const start = (webpackConfig, projectType) => {
         };
     }
 
-    const devServer = new WebpackDevServer(serverConfig, compiler);
+    const devServer = new WebpackDevServer(merge(serverConfig, webpackConfig.devServer ?? {}), compiler);
 
     devServer.startCallback(err => {
         if (err) {

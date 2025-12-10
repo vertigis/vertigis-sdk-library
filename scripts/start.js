@@ -12,7 +12,6 @@ import { hideBin } from "yargs/helpers";
 import paths from "../config/paths.js";
 
 /**
- *
  * @param {webpack.Configuration} webpackConfig
  * @param {"web" | "workflow"} projectType
  */
@@ -21,11 +20,10 @@ const start = (webpackConfig, projectType) => {
     // @ts-ignore
     const argv = yargs(hideBin(process.argv)).argv;
     const isWeb = projectType === "web";
-    const httpAgent = new http.Agent({ keepAlive: true });
-    const httpsAgent = new https.Agent({ keepAlive: true });
-    const port = process.env.PORT ?? (isWeb ? 3001 : 5000);
-    const viewerTarget = process.env.VIEWER_URL || "https://apps.vertigisstudio.com/web";
-    const serverType = (isWeb && viewerTarget.startsWith("https")) || !isWeb ? "https" : "http"
+    const port = argv["port"] ?? process.env.PORT ?? (isWeb ? 3001 : 5000);
+    // Set this to 0.0.0.0 to allow binding to any host.
+    const host = argv["host"] ?? "localhost";
+    const serverType = argv["type"] ?? (host === "localhost" ? "http" : "https");
     const compiler = webpack(webpackConfig);
 
     /**
@@ -43,14 +41,13 @@ const start = (webpackConfig, projectType) => {
         headers: {
             "Access-Control-Allow-Origin": "*",
         },
-        // Set this to 0.0.0.0 to allow binding to any host.
-        host: argv["host"] ?? "localhost",
+        host,
         hot: isWeb,
         open:
             process.env.SMOKE_TEST !== "true" &&
             process.env.OPEN_BROWSER !== "false" &&
             (isWeb
-                ? `http://localhost:${port}${process.env.OPEN_PAGE || ""}`
+                ? `${serverType}://${host}:${port}${process.env.OPEN_PAGE || ""}`
                 : { target: ["main.js"] }),
         port,
         server: {
@@ -62,7 +59,7 @@ const start = (webpackConfig, projectType) => {
                 cert: argv["cert"],
                 // @ts-ignore
                 ca: argv["ca"],
-            }
+            },
         },
         static: {
             publicPath: isWeb ? undefined : "/",
@@ -75,11 +72,14 @@ const start = (webpackConfig, projectType) => {
 
     // Proxy configuration for Web
     if (projectType === "web") {
+        const viewerTarget = process.env.VIEWER_URL || "https://apps.vertigisstudio.com/web";
         serverConfig.proxy = [
             {
                 path: "/viewer",
                 target: viewerTarget,
-                agent: serverType === "https" ? httpsAgent : httpAgent,
+                agent: viewerTarget.startsWith("https")
+                    ? new https.Agent({ keepAlive: true })
+                    : new http.Agent({ keepAlive: true }),
                 changeOrigin: true,
                 logLevel: "warn",
                 pathRewrite: {

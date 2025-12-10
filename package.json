@@ -63,7 +63,7 @@
         "@types/fs-extra": "^11.0.4",
         "@types/jest": "^30.0.0",
         "@types/yargs": "^17.0.33",
-        "@vertigis/workflow": "^5.47.0",
+        "@vertigis/workflow": "^5.48.2",
         "conventional-changelog-conventionalcommits": "7.0.2",
         "del-cli": "~6.0.0",
         "execa": "~9.6.0",
@@ -75,9 +75,8 @@
         "webpack-merge": "^6.0.1"
     },
     "overrides": {
-        "express": "~5.1.0"
-    },
-    "overridesComments": {
-        "express": "Remove after upgrading to a non-vulnerable webpack-dev-server"
+        "@vertigis/workflow": {
+            "react": ">=18 <20"
+        }
     }
 }

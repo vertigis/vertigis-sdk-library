@@ -5,6 +5,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as spawn from "cross-spawn";
 import fetch from "node-fetch";
+import { HttpsProxyAgent } from "https-proxy-agent";
 
 /**
  * This scripts updates a custom sdk library to point to the latest verstions of
@@ -15,12 +16,14 @@ import fetch from "node-fetch";
  */
 const upgrade = async (sdkPath, projectType) => {
     const product = `${projectType.charAt(0).toUpperCase()}${projectType.slice(1)}`;
+    const proxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
+    const agent = proxy ? new HttpsProxyAgent(proxy) : undefined;
 
     console.info(`Determining latest versions of ${product} and ${product} SDK...`);
 
     const responses = await Promise.all([
-        fetch(`https://registry.npmjs.com/@vertigis/${projectType}/`),
-        fetch(`https://registry.npmjs.com/@vertigis/${projectType}-sdk/`),
+        fetch(`https://registry.npmjs.com/@vertigis/${projectType}/`, { agent }),
+        fetch(`https://registry.npmjs.com/@vertigis/${projectType}-sdk/`, { agent }),
     ]);
 
     const [productInfo, sdkInfo] = await Promise.all(responses.map(r => r.json()));

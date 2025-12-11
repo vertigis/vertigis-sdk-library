@@ -144,12 +144,12 @@ async function testGenerate() {
             .trim();
 
     const createDataCallback =
-        (/** @type {{ endsWith: string; write: string; matched?: boolean; }[]} */ matches) =>
+        (/** @type {{ contains: string; write: string; matched?: boolean; }[]} */ matches) =>
         (/** @type {string} */ data) => {
             const cleanData = cleanStdoutData(data);
 
             for (const match of matches) {
-                if (!match.matched && cleanData.endsWith(match.endsWith)) {
+                if (!match.matched && cleanData.includes(match.contains)) {
                     subprocess.stdin.write(match.write);
                     // Because of the nature of inquirer clearing and reprinting
                     // lines in the console, we can receive data events that end
@@ -168,16 +168,16 @@ async function testGenerate() {
         createDataCallback([
             // Being asked about what we'd like to create (activity or form element)
             {
-                endsWith: "Form Element",
+                contains: "ActivityForm Element",
                 // Hit enter on default selected item (activity)
                 write: "\n",
             },
             {
-                endsWith: "What is the activity name",
+                contains: "What is the activity name",
                 write: "FooName\n",
             },
             {
-                endsWith: "What is the description",
+                contains: "What is the description",
                 write: "FooName description\n",
             },
         ])
@@ -243,16 +243,16 @@ async function testGenerate() {
         createDataCallback([
             // Being asked about what we'd like to create (activity or form element)
             {
-                endsWith: "Form Element",
+                contains: "ActivityForm Element",
                 // Down arrow + enter (select form element option)
                 write: "\u001b[B\n",
             },
             {
-                endsWith: "What is the element name",
+                contains: "What is the element name",
                 write: "BarName\n",
             },
             {
-                endsWith: "What is the description",
+                contains: "What is the description",
                 write: "BarName description\n",
             },
         ])
@@ -375,15 +375,10 @@ async function testStartProject() {
     });
 
     const testStartWorkflow = async () => {
-        // The dev server uses a self signed cert which the `https` module won't allow by default.
-        const unsafeAgent = new https.Agent({ rejectUnauthorized: false });
-
         await pRetry(async () => {
             let response;
             try {
-                response = await fetch("https://localhost:5000/main.js", {
-                    agent: unsafeAgent,
-                });
+                response = await fetch("http://localhost:5000/main.js");
             } catch {
                 assert.fail();
             }
@@ -421,7 +416,10 @@ async function testStartProject() {
 
 async function testUpgradeProject() {
     // Copy the project to upgrade to a temp location.
-    const originalProjectPath = path.join(process.env.UPGRADE_PROJECTS_PATH, (process.env.SDK_PLATFORM === "web" ? "web-1.11.1" : "workflow-5.1.2"));
+    const originalProjectPath = path.join(
+        process.env.UPGRADE_PROJECTS_PATH,
+        process.env.SDK_PLATFORM === "web" ? "web-1.11.1" : "workflow-5.1.2"
+    );
     const projectPath = path.join(process.env.ROOT_DIRECTORY, "upgrade");
     await fs.promises.cp(originalProjectPath, projectPath, { recursive: true });
 
@@ -437,20 +435,22 @@ async function testUpgradeProject() {
     const latestSDK = sdkInfo["dist-tags"]?.latest;
 
     // Run the upgrade script.
-    subprocess = runNpmScript(["upgrade", process.env.ROOT_DIRECTORY], {cwd: projectPath});
+    subprocess = runNpmScript(["upgrade", process.env.ROOT_DIRECTORY], { cwd: projectPath });
     await subprocess;
 
     // Read the package.json file after upgrading.
-    const projectPackage = JSON.parse(await fs.promises.readFile(path.join(projectPath, "package.json"), "utf8"));
+    const projectPackage = JSON.parse(
+        await fs.promises.readFile(path.join(projectPath, "package.json"), "utf8")
+    );
 
     assert.strictEqual(
-        projectPackage.devDependencies[`@vertigis/${process.env.SDK_PLATFORM}`], 
+        projectPackage.devDependencies[`@vertigis/${process.env.SDK_PLATFORM}`],
         `^${latestProduct}`,
         `Base ${process.env.SDK_PLATFORM} package should be upgraded to version ${latestProduct}`
     );
-    
+
     assert.strictEqual(
-        projectPackage.devDependencies[`@vertigis/${process.env.SDK_PLATFORM}-sdk`], 
+        projectPackage.devDependencies[`@vertigis/${process.env.SDK_PLATFORM}-sdk`],
         `^${latestSDK}`,
         `SDK package for ${process.env.SDK_PLATFORM} should be upgraded to version ${latestSDK}`
     );
@@ -461,19 +461,15 @@ async function testUpgradeProject() {
         "New ESlint configuration should be added."
     );
 
-    assert.strictEqual(
-        projectPackage.type,
-        "module",
-        "Project type should be set to 'module'."
-    );
+    assert.strictEqual(projectPackage.type, "module", "Project type should be set to 'module'.");
 
     assert.strictEqual(
         projectPackage.devDependencies.typescript,
         "^5.4.0",
         "Minimum typescript version required by the SDK build should be 5.4"
-    )
+    );
 
-    fs.rmSync(projectPath, { recursive: true })
+    fs.rmSync(projectPath, { recursive: true });
 }
 
 function cleanup() {

@@ -4,6 +4,7 @@
 import * as http from "http";
 import * as https from "https";
 import webpack from "webpack";
+import { merge } from "webpack-merge";
 import WebpackDevServer from "webpack-dev-server";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
@@ -11,7 +12,6 @@ import { hideBin } from "yargs/helpers";
 import paths from "../config/paths.js";
 
 /**
- *
  * @param {webpack.Configuration} webpackConfig
  * @param {"web" | "workflow"} projectType
  */
@@ -19,12 +19,11 @@ const start = (webpackConfig, projectType) => {
     /** @type {Record<string, string>} */
     // @ts-ignore
     const argv = yargs(hideBin(process.argv)).argv;
-
     const isWeb = projectType === "web";
-    const httpAgent = new http.Agent({ keepAlive: true });
-    const httpsAgent = new https.Agent({ keepAlive: true });
-    const port = process.env.PORT ?? (isWeb ? 3001 : 5000);
-    const viewerTarget = process.env.VIEWER_URL || "https://apps.vertigisstudio.com/web";
+    const port = argv["port"] ?? process.env.PORT ?? (isWeb ? 3001 : 5000);
+    // Set this to 0.0.0.0 to allow binding to any host.
+    const host = argv["host"] ?? "localhost";
+    const serverType = argv["type"] ?? ((host === "localhost" && isWeb) ? "http" : "https");
     const compiler = webpack(webpackConfig);
 
     /**
@@ -42,16 +41,26 @@ const start = (webpackConfig, projectType) => {
         headers: {
             "Access-Control-Allow-Origin": "*",
         },
-        // Set this to 0.0.0.0 to allow binding to any host.
-        host: argv["host"] ?? "localhost",
+        host,
         hot: isWeb,
         open:
             process.env.SMOKE_TEST !== "true" &&
             process.env.OPEN_BROWSER !== "false" &&
             (isWeb
-                ? `http://localhost:${port}${process.env.OPEN_PAGE || ""}`
+                ? `${serverType}://${host}:${port}${process.env.OPEN_PAGE || ""}`
                 : { target: ["main.js"] }),
         port,
+        server: {
+            type: serverType,
+            options: {
+                // @ts-ignore
+                key: argv["key"],
+                // @ts-ignore
+                cert: argv["cert"],
+                // @ts-ignore
+                ca: argv["ca"],
+            },
+        },
         static: {
             publicPath: isWeb ? undefined : "/",
             directory: isWeb ? paths.projPublicDir : undefined,
@@ -63,11 +72,14 @@ const start = (webpackConfig, projectType) => {
 
     // Proxy configuration for Web
     if (projectType === "web") {
+        const viewerTarget = process.env.VIEWER_URL || "https://apps.vertigisstudio.com/web";
         serverConfig.proxy = [
             {
                 path: "/viewer",
                 target: viewerTarget,
-                agent: viewerTarget.startsWith("https") ? httpsAgent : httpAgent,
+                agent: viewerTarget.startsWith("https")
+                    ? new https.Agent({ keepAlive: true })
+                    : new http.Agent({ keepAlive: true }),
                 changeOrigin: true,
                 logLevel: "warn",
                 pathRewrite: {
@@ -79,23 +91,8 @@ const start = (webpackConfig, projectType) => {
         ];
     }
 
-    // HTTPS server configuration for Workflow
-    if (projectType === "workflow") {
-        const argv = yargs(hideBin(process.argv)).parseSync();
-        serverConfig.server = {
-            type: "https",
-            options: {
-                // @ts-ignore
-                key: argv["key"],
-                // @ts-ignore
-                cert: argv["cert"],
-                // @ts-ignore
-                ca: argv["ca"],
-            },
-        };
-    }
-
-    const devServer = new WebpackDevServer(serverConfig, compiler);
+    const mergedConfig = merge(serverConfig, webpackConfig.devServer ?? {});
+    const devServer = new WebpackDevServer(mergedConfig, compiler);
 
     devServer.startCallback(err => {
         if (err) {

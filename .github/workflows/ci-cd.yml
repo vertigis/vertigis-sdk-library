@@ -1,9 +1,9 @@
 name: CI/CD
 
-on: 
+on:
     push:
         branches:
-            - 'main'
+            - "main"
     workflow_dispatch:
 
 env:
@@ -15,7 +15,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         steps:
             - uses: actions/checkout@v4
-              with: 
+              with:
                   # Pulls all commits (needed for semantic release to correctly version)
                   # See https://github.com/semantic-release/semantic-release/issues/1526
                   fetch-depth: "0"
@@ -30,7 +30,11 @@ jobs:
               with:
                   node-version: 22.x
 
-            - run: npm install
+            - name: Audit packages
+              run: npx audit-ci
+
+            - name: Install packages
+              run: npm install
 
             - name: Release 🚀
               env:

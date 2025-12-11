@@ -23,7 +23,7 @@ const start = (webpackConfig, projectType) => {
     const port = argv["port"] ?? process.env.PORT ?? (isWeb ? 3001 : 5000);
     // Set this to 0.0.0.0 to allow binding to any host.
     const host = argv["host"] ?? "localhost";
-    const serverType = argv["type"] ?? (host === "localhost" ? "http" : "https");
+    const serverType = argv["type"] ?? ((host === "localhost" && isWeb) ? "http" : "https");
     const compiler = webpack(webpackConfig);
 
     /**

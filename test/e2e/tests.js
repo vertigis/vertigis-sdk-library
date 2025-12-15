@@ -361,7 +361,7 @@ async function testActivityPackMetadataGeneration() {
 }
 
 async function testStartProject() {
-    subprocess = runNpmScript(["start"], { cwd: process.env.TEST_PROJECT_PATH });
+    subprocess = runNpmScript(["start", "--type", "http"], { cwd: process.env.TEST_PROJECT_PATH });
 
     // Wait for webpack-dev-server to start. It can take some time!
     await new Promise(resolve => {

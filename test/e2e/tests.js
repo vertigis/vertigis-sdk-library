@@ -460,6 +460,14 @@ async function testUpgradeProject() {
         true,
         "New ESlint configuration should be added."
     );
+    
+    if (process.env.SDK_PLATFORM === "workflow") {
+        assert.strictEqual(
+            fs.existsSync(path.join(projectPath, "uuid.cjs")),
+            true,
+            "Extension of uuid file should be 'cjs'."
+        )
+    }
 
     assert.strictEqual(projectPackage.type, "module", "Project type should be set to 'module'.");
 

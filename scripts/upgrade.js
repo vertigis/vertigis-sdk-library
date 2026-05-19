@@ -74,6 +74,12 @@ const upgrade = async (sdkPath, projectType) => {
         projectPackage.type = "module";
     }
 
+    // If this is a workflow project the extension of the "uuid.js" file needs
+    // to also change.
+    if (projectType === "workflow" && fs.existsSync("uuid.js")) {
+        fs.renameSync("uuid.js", "uuid.cjs");
+    }
+
     console.info("Updating package.json...");
     await fs.promises.writeFile(
         "package.json",

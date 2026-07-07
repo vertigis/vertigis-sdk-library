@@ -53,7 +53,7 @@
         "typescript-eslint": "^8.38.0",
         "url-loader": "^4.1.1",
         "webpack": "^5.101.0",
-        "webpack-dev-server": "^5.2.2",
+        "webpack-dev-server": "^6.0.0",
         "yargs": "^18.0.0"
     },
     "devDependencies": {
@@ -78,5 +78,11 @@
         "@vertigis/workflow": {
             "react": ">=18 <20"
         }
+    },
+    "allowScripts": {
+        "@swc/core": true,
+        "@vaadin/vaadin-usage-statistics": false,
+        "unrs-resolver": false,
+        "playwright-chromium": false
     }
 }

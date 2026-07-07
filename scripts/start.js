@@ -4,8 +4,8 @@
 import * as http from "http";
 import * as https from "https";
 import webpack from "webpack";
-import { merge } from "webpack-merge";
 import WebpackDevServer from "webpack-dev-server";
+import { merge } from "webpack-merge";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
@@ -27,7 +27,7 @@ const start = (webpackConfig, projectType) => {
     const compiler = webpack(webpackConfig);
 
     /**
-     * @type { WebpackDevServer.Configuration }
+     * @type { import("webpack-dev-server").Configuration }
      */
     const serverConfig = {
         allowedHosts: argv["allowed-hosts"] ?? "all",
@@ -81,7 +81,6 @@ const start = (webpackConfig, projectType) => {
                     ? new https.Agent({ keepAlive: true })
                     : new http.Agent({ keepAlive: true }),
                 changeOrigin: true,
-                logLevel: "warn",
                 pathRewrite: {
                     // Strip /viewer from path so it isn't forwarded to the target
                     // /viewer/index.html => /index.html => https://apps.vertigisstudio.com/web/index.html

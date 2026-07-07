@@ -12,6 +12,7 @@
         "moduleResolution": "bundler",
         "noEmit": true,
         "noImplicitAny": true,
+        "noUncheckedSideEffectImports": false,
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "strict": true,

@@ -5,7 +5,6 @@ import { execa } from "execa";
 import { strict as assert } from "assert";
 import fetch from "node-fetch";
 import * as fs from "fs";
-import https from "https";
 import path from "path";
 import { chromium } from "playwright-chromium";
 import pRetry from "p-retry";

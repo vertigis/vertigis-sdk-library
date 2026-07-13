@@ -11,11 +11,11 @@ const { webpack } = Webpack;
  * SDK project build script.
  *
  * @param {import("webpack").Configuration} webpackConfig
- * @param {"web" | "workflow"} projectType
+ * @param {"web" | "workflow" | string} projectType
  *
  * @returns {Promise<void>}
  */
-const build = async (webpackConfig, projectType) => {
+const build = async (webpackConfig, projectType = process.env.SDK_PLATFORM) => {
     console.log("Creating an optimized production build...\n");
 
     const compiler = webpack(webpackConfig);

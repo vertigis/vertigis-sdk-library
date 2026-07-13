@@ -2,6 +2,7 @@
 "use strict";
 import * as crypto from "crypto";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
+import TerserPlugin from "terser-webpack-plugin";
 import webpack from "webpack";
 
 import paths from "./paths.js";
@@ -12,6 +13,13 @@ const isEnvProduction = process.env.NODE_ENV === "production";
 // especially important to avoid collisions when multiple webpack runtimes are
 // in the same document, such as Web's runtime and this library's runtime.
 const libId = crypto.randomBytes(8).toString("hex");
+
+const banner = `library id ${libId}
+${process.env.SDK_PLATFORM} v${process.env.PLATFORM_VERSION} 
+${process.env.SDK_PLATFORM}-sdk v${process.env.SDK_VERSION}
+sdk-library v${process.env.SDK_LIBRARY_VERSION}`;
+
+const bannerRegExp = new RegExp(libId, "g");
 
 /**
  * A base webpack configuration designed to build a library as a single amd file.
@@ -33,7 +41,9 @@ const baseConfig = {
         // one chunk, but we set this here just to be extra safe against
         // collisions.
         chunkLoadingGlobal: libId,
-        libraryTarget: "amd",
+        library: {
+            type: "amd"
+        },
         publicPath: "/",
         path: isEnvProduction ? paths.projBuild : undefined,
         // There will be one main bundle, and one file per asynchronous chunk.
@@ -99,7 +109,18 @@ const baseConfig = {
         }),
         new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
         new ForkTsCheckerWebpackPlugin(),
+        new webpack.BannerPlugin({ banner }),
     ],
+    optimization: {
+        minimizer: [new TerserPlugin({ 
+            extractComments: false,
+            terserOptions: {
+                format: {
+                    comments: bannerRegExp
+                }
+            }
+        })]
+    },
     watchOptions: {
         // Don't bother watching node_modules files for changes. This reduces
         // CPU/mem overhead, but means that changes from `npm install` while the

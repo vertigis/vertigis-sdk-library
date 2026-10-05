@@ -43,7 +43,8 @@
         "html-webpack-plugin": "^5.6.4",
         "https-proxy-agent": "^7.0.6",
         "inquirer": "~12.9.0",
-        "playwright-chromium": "^1.56.1",
+        "node-fetch": "~3.3.2",
+        "playwright-chromium": "^1.63.0",
         "postcss": "^8.5.6",
         "postcss-loader": "^8.1.1",
         "postcss-preset-env": "^10.2.4",
@@ -70,7 +71,6 @@
         "del-cli": "~6.0.0",
         "execa": "~9.6.0",
         "jest": "^30.2.0",
-        "node-fetch": "~3.3.2",
         "prettier": "~3.5.3",
         "p-retry": "^7.0.0",
         "typescript": "^5.3.3",
@@ -83,9 +83,10 @@
         "brace-expansion": "~5.0.9"
     },
     "allowScripts": {
+        "@mui/x-telemetry": false,
         "@swc/core": true,
         "@vaadin/vaadin-usage-statistics": false,
-        "unrs-resolver": false,
+        "unrs-resolver": true,
         "playwright-chromium": false
     }
 }

@@ -84,6 +84,7 @@
     },
     "allowScripts": {
         "@mui/x-telemetry": false,
+        "@parcel/watcher": true,
         "@swc/core": true,
         "@vaadin/vaadin-usage-statistics": false,
         "unrs-resolver": true,

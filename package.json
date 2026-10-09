@@ -21,7 +21,7 @@
     "scripts": {
         "postpack": "del-cli *.d.ts config/*.d.ts  lib/**/*.d.ts scripts/*.d.ts test/**/*.d.ts",
         "prepack": "tsc",
-        "prettier": "prettier --write \"**/*.json\" \"**/*.js\"",
+        "prettier": "prettier --write \"**/*.json\" \"**/*.js\" \"**/*.md\"",
         "test": "npm run test:unit && npm run test:e2e",
         "test:e2e": "node ./test/e2e/index.js",
         "test:unit": "jest"
@@ -84,6 +84,7 @@
     },
     "allowScripts": {
         "@mui/x-telemetry": false,
+        "@parcel/watcher": true,
         "@swc/core": true,
         "@vaadin/vaadin-usage-statistics": false,
         "unrs-resolver": true,

@@ -1,6 +1,8 @@
 # VertiGIS SDK Library
 
-This repo contains a library of configuration and routines that are shared between the VertiGIS [Web](https://github.com/vertigis/vertigis-web-sdk) and [Workflow](https://github.com/vertigis/vertigis-workflow-sdk) SDK projects.
+This repo contains a library of configuration and routines that are shared between the VertiGIS
+[Web](https://github.com/vertigis/vertigis-web-sdk) and
+[Workflow](https://github.com/vertigis/vertigis-workflow-sdk) SDK projects.
 
 ## Requirements
 
@@ -11,25 +13,32 @@ This repo contains a library of configuration and routines that are shared betwe
 
 To test a generated project (either Web or Workflow):
 
-- Checkout both the PR branch for this repo and the main branch sdk repo you are interested in into the same folder.
+- Checkout both the PR branch for this repo and the main branch sdk repo you are interested in into
+  the same folder.
 - In this repo run `npm i` and then `npm link`.
-- In the Web or Workflow SDK repo run `npm i` and then `npm link @vertigis/sdk-library` and finally `npm link` with no parameter.
-- Now you can execute SDK commands like `npx @vertigis/web-sdk create ...` and as long as you _leave off_ the @version you'll use the local code to run the command.
+- In the Web or Workflow SDK repo run `npm i` and then `npm link @vertigis/sdk-library` and finally
+  `npm link` with no parameter.
+- Now you can execute SDK commands like `npx @vertigis/web-sdk create ...` and as long as you _leave
+  off_ the @version you'll use the local code to run the command.
 
 To execute commands from the generated project:
 
-- Once the project is created navigate to it and run `npm link @vertigis/web-sdk` or `npm link @vertigis/workflow-sdk` as appropriate.
-- Then you can `npm build` `npm start` etc as normal in the project and the code from your development copies will be executed.
+- Once the project is created navigate to it and run `npm link @vertigis/web-sdk` or
+  `npm link @vertigis/workflow-sdk` as appropriate.
+- Then you can `npm build` `npm start` etc as normal in the project and the code from your
+  development copies will be executed.
 
 To run the tests in development:
 
-- The above setup is sufficent to run the tests from the `web-sdk` or `workflow-sdk` repos. Normally this should be enough.
-- To run in development tests from `sdk-library` against development copies of the sdk repos you need to change the `npm pack` statement in `test/e2e/index.js` to point at your local sdk repos.
+- The above setup is sufficent to run the tests from the `web-sdk` or `workflow-sdk` repos. Normally
+  this should be enough.
+- To run in development tests from `sdk-library` against development copies of the sdk repos you
+  need to change the `npm pack` statement in `test/e2e/index.js` to point at your local sdk repos.
 - Assuming everything is in the same folder, look for this line and change it like this:
 
-```
--- await $`npm pack @vertigis/${process.env.SDK_PLATFORM}-sdk ...
-++ await $`npm pack ../vertigis-${process.env.SDK_PLATFORM}-sdk ...
+```diff
+- await $`npm pack @vertigis/${process.env.SDK_PLATFORM}-sdk ...
++ await $`npm pack ../vertigis-${process.env.SDK_PLATFORM}-sdk ...
 ```
 
 - This will cause `sdk-library` to use packaged code from your development copies to run the tests.

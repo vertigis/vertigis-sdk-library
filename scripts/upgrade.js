@@ -54,7 +54,7 @@ const upgrade = async (sdkPath, projectType) => {
     // This is the current minimum version of typescript required by the SDK
     // build system. If you change it, also change the upgrade test to check for
     // the new version.
-    projectPackage.devDependencies.typescript = "^5.4.0";
+    projectPackage.devDependencies.typescript = "^6.0.3";
 
     // Check for old eslint configuration and fix it.
     if (fs.existsSync(".eslintrc.js") && !fs.existsSync("eslint.config.js")) {

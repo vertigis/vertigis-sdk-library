@@ -1,7 +1,14 @@
-
 {
     "arrowParens": "avoid",
-    "printWidth": 100,
+    "printWidth": 120,
     "tabWidth": 4,
-    "trailingComma": "es5"
+    "trailingComma": "es5",
+    "overrides": [
+        {
+            "files": "*.md",
+            "options": {
+                "proseWrap": "always"
+            }
+        }
+    ]
 }

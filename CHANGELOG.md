@@ -49,7 +49,8 @@
 
 ### Changed
 
-- **Breaking:** set `module` to `preserve` in the base TypeScript config (needs TypeScript 5.4 or later)
+- **Breaking:** set `module` to `preserve` in the base TypeScript config (needs TypeScript 5.4 or
+  later)
 - Set `typescript` to `^5.4.0` in projects that the `upgrade` script upgrades
 
 ### Added
@@ -67,19 +68,8 @@ _Initial release._
 
 [2.1.7]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.1.7
 [2.1.6]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.1.6
-[2.1.5]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.1.5
-[2.1.4]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.1.4
-[2.1.3]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.1.3
-[2.1.2]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.1.2
-[2.1.1]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.1.1
 [2.1.0]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.1.0
-[2.0.6]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.0.6
 [2.0.5]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.0.5
-[2.0.4]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.0.4
-[2.0.3]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.0.3
 [2.0.2]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.0.2
-[2.0.1]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.0.1
 [2.0.0]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v2.0.0
-[1.0.2]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v1.0.2
-[1.0.1]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v1.0.1
 [1.0.0]: https://github.com/vertigis/vertigis-sdk-library/releases/tag/v1.0.0

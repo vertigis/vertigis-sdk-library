@@ -472,8 +472,8 @@ async function testUpgradeProject() {
 
     assert.strictEqual(
         projectPackage.devDependencies.typescript,
-        "^5.4.0",
-        "Minimum typescript version required by the SDK build should be 5.4"
+        "^6.0.3",
+        "Minimum typescript version required by the SDK build should be 6.0.3"
     );
 
     fs.rmSync(projectPath, { recursive: true });

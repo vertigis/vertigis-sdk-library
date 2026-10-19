@@ -62,55 +62,70 @@ const changelog = async (sourceDir, scriptHeader, breakingOnly = true, projectTy
                             children: [
                                 {
                                     type: "inlineCode",
-                                    value: `[${projectType}]:`
+                                    value: `[${projectType}]`
                                 },
                                 {
                                     type: "text",
-                                    value: ` ${productVersion ?? "Unknown"}`
-                                }
-                            ]
-                        },
-                        {   
-                            type: "paragraph",
-                            children: [
-                                {
-                                    type: "inlineCode",
-                                    value: `[${projectType}-sdk]:`
-                                },
-                                {
-                                    type: "text",
-                                    value: ` ${sdkVersion ?? "Unknown"}`
-                                }
-                            ]
-                        },
-                        {   
-                            type: "paragraph",
-                            children: [
-                                {
-                                    type: "inlineCode",
-                                    value: "[sdk-library]: "
-                                },
-                                {
-                                    type: "text",
-                                    value: ` ${libraryVersion ?? "Unknown"}`
-                                }
-                            ]
-                        },
-                        {   
-                            type: "paragraph",
-                            children: [
-                                {
-                                    type: "inlineCode",
-                                    value: "[react-ui]: "
-                                },
-                                {
-                                    type: "text",
-                                    value: ` ${reactUiVersion ?? "Unknown"}`
+                                    value: `: ${productVersion ?? "Unknown"}`
                                 }
                             ]
                         },
                     ]
-                }
+                },
+                {
+                    type: "listItem",
+                    children: [
+                        {   
+                            type: "paragraph",
+                            children: [
+                                {
+                                    type: "inlineCode",
+                                    value: `[${projectType}-sdk]`
+                                },
+                                {
+                                    type: "text",
+                                    value: `: ${sdkVersion ?? "Unknown"}`
+                                }
+                            ]
+                        },
+                    ]
+                },
+                {
+                    type: "listItem",
+                    children: [
+                        {   
+                            type: "paragraph",
+                            children: [
+                                {
+                                    type: "inlineCode",
+                                    value: "[sdk-library]"
+                                },
+                                {
+                                    type: "text",
+                                    value: `: ${libraryVersion ?? "Unknown"}`
+                                }
+                            ]
+                        },
+                    ]
+                },
+                (projectType === "web" && ({ 
+                    type: "listItem",
+                    children: [
+                        {  
+                            type: "paragraph",
+                            children: [
+                                {
+                                    type: "inlineCode",
+                                    value: "[react-ui]"
+                                },
+                                {
+                                    type: "text",
+                                    value: `: ${reactUiVersion ?? "Unknown"}`
+                                }
+                            ]
+                        }
+                    ]
+                })),
             ]
         },
         {
@@ -156,18 +171,7 @@ const changelog = async (sourceDir, scriptHeader, breakingOnly = true, projectTy
     /**
      * @type {import("mdast").RootContent[]}
      */
-    const treeChildren = [
-        {
-            type: "heading",
-            depth: 1,
-            children: [
-                {
-                    type: "text",
-                    value: "Changelog",
-                },
-            ],
-        },
-        ...messages,
+    const changelogMessages = [
         allChangeItems.length > 0
             ? {
                   type: "heading",
@@ -220,6 +224,43 @@ const changelog = async (sourceDir, scriptHeader, breakingOnly = true, projectTy
               }
             : undefined,
         ...allFixItems.map(fix => fix.item),
+    ];
+
+    const filteredChangelog = changelogMessages.filter(child => !!child)
+
+    if (filteredChangelog.length === 0) {
+        filteredChangelog.push({
+            type: "paragraph",
+            children: [
+                {
+                    type: "emphasis",
+                    children: [
+                        {
+                            type: "text",
+                            value: `No ${breakingOnly ? "breaking changes" : "changes"} found`
+                        }
+                    ]
+                }
+            ]
+        })
+    }
+
+    /**
+     * @type {import("mdast").RootContent[]}
+     */
+    const treeChildren = [
+        {
+            type: "heading",
+            depth: 1,
+            children: [
+                {
+                    type: "text",
+                    value: "Changelog",
+                },
+            ],
+        },
+        ...messages,
+        ...filteredChangelog
     ];
 
     /**

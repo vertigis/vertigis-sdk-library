@@ -42,7 +42,7 @@ const baseConfig = {
         // collisions.
         chunkLoadingGlobal: libId,
         library: {
-            type: "amd"
+            type: "amd",
         },
         publicPath: "/",
         path: isEnvProduction ? paths.projBuild : undefined,
@@ -112,14 +112,16 @@ const baseConfig = {
         new webpack.BannerPlugin({ banner }),
     ],
     optimization: {
-        minimizer: [new TerserPlugin({ 
-            extractComments: false,
-            terserOptions: {
-                format: {
-                    comments: bannerRegExp
-                }
-            }
-        })]
+        minimizer: [
+            new TerserPlugin({
+                extractComments: false,
+                terserOptions: {
+                    format: {
+                        comments: bannerRegExp,
+                    },
+                },
+            }),
+        ],
     },
     watchOptions: {
         // Don't bother watching node_modules files for changes. This reduces

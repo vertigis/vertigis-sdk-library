@@ -62,10 +62,7 @@ const upgrade = async (sdkPath, projectType) => {
         console.info(
             "If you have existing '.eslintrc.js' configuration you will need to migrate any custom config to the new file."
         );
-        fs.copyFileSync(
-            path.join(sdkPath, "./config/eslint.config.js.template"),
-            "eslint.config.js"
-        );
+        fs.copyFileSync(path.join(sdkPath, "./config/eslint.config.js.template"), "eslint.config.js");
     }
 
     // Change the type from "commonjs" to "module"
@@ -81,11 +78,7 @@ const upgrade = async (sdkPath, projectType) => {
     }
 
     console.info("Updating package.json...");
-    await fs.promises.writeFile(
-        "package.json",
-        JSON.stringify(projectPackage, undefined, 4),
-        "utf8"
-    );
+    await fs.promises.writeFile("package.json", JSON.stringify(projectPackage, undefined, 4), "utf8");
 
     if (!process.env.SMOKE_TEST) {
         console.info("Running npm install...");

@@ -55,9 +55,7 @@ const build = async (webpackConfig, projectType = process.env.SDK_PLATFORM) => {
                 console.log(chalk.yellow("\nCompiled with warnings.\n"));
             } else {
                 console.log(chalk.green("\nCompiled successfully.\n"));
-                console.log(
-                    `Your production build was created inside the ${chalk.cyan("build")} folder.`
-                );
+                console.log(`Your production build was created inside the ${chalk.cyan("build")} folder.`);
                 console.log(
                     `You can learn more about deploying your custom code at ${chalk.cyan(
                         `https://developers.vertigisstudio.com/docs/${projectType}/overview/`

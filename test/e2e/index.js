@@ -14,13 +14,11 @@ const scriptsPath = path.join(sdkPath, "package/scripts");
 const configPath = path.join(sdkPath, "package/config");
 
 async function downloadSdk() {
-    console.log(
-        `Downloading and extracting the @vertigis/${process.env.SDK_PLATFORM}-sdk package:`
-    );
+    console.log(`Downloading and extracting the @vertigis/${process.env.SDK_PLATFORM}-sdk package:`);
 
     await $`mkdir ${sdkDirectory}`;
-    await $`npm pack @vertigis/${process.env.SDK_PLATFORM}-sdk --pack-destination ${sdkDirectory}`
-        .pipe`tr -d [:space:]`.pipe`xargs -I % tar -xzf ${sdkDirectory}/% -C ${sdkDirectory}`;
+    await $`npm pack @vertigis/${process.env.SDK_PLATFORM}-sdk --pack-destination ${sdkDirectory}`.pipe`tr -d [:space:]`
+        .pipe`xargs -I % tar -xzf ${sdkDirectory}/% -C ${sdkDirectory}`;
 }
 
 async function repathImports() {

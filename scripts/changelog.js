@@ -1,277 +1,80 @@
 // @ts-check
 "use strict";
 
-import { fromMarkdown } from "mdast-util-from-markdown";
-import { toMarkdown } from "mdast-util-to-markdown";
-import {
-    changeItemComparer,
-    getChangelogEntriesByVersion,
-    getChangelogFiles,
-    getSoftwareVersions,
-} from "../lib/shared/changelogUtils.js";
+import fs from "node:fs/promises";
+import path from "node:path";
+
+import { getVersion, renderChangelog } from "../lib/shared/changelogUtils.js";
 
 /**
- * SDK project changelog script.
+ * @typedef {object} SourceLocation
+ * @property {string} name The name in the build banner, for example `web-sdk`.
+ * @property {string} changelogPath The path of the changelog, relative to the source folder.
+ */
+
+/**
+ * Get the software products that can have changes that affect a project.
  *
- * @param {string} sourceDir
- * @param {string} scriptHeader
- * @param {boolean} breakingOnly
- * @param {"web" | "workflow" | string} projectType
+ * @param {"web" | "workflow"} projectType
+ *
+ * @returns {SourceLocation[]}
+ */
+const getSources = projectType => [
+    { name: projectType, changelogPath: `node_modules/@vertigis/${projectType}/CHANGELOG.md` },
+    { name: `${projectType}-sdk`, changelogPath: "CHANGELOG.md" },
+    { name: "sdk-library", changelogPath: "node_modules/@vertigis/sdk-library/CHANGELOG.md" },
+    // Only Web projects use react-ui.
+    ...(projectType === "web"
+        ? [{ name: "react-ui", changelogPath: "node_modules/@vertigis/react-ui/CHANGELOG.md" }]
+        : []),
+];
+
+/**
+ * Read a changelog file. Show a warning if the file is missing.
+ *
+ * @param {string} filePath
+ * @param {string} name The name of the software product, for the warning.
+ *
+ * @returns {Promise<string | undefined>} The content, or `undefined` if the file is missing.
+ */
+const readChangelog = async (filePath, name) => {
+    try {
+        return await fs.readFile(filePath, "utf8");
+    } catch {
+        console.warn(`Could not find a changelog for the ${name} repository.`);
+        return undefined;
+    }
+};
+
+/**
+ * SDK project changelog script. Make a Markdown report of the changes since the
+ * software versions that built a library.
+ *
+ * @param {object} options
+ * @param {string} options.sourceDir The folder that contains the changelogs.
+ * @param {string} options.banner The banner comment of the built library.
+ * @param {boolean} [options.breakingOnly] If `true` include only the breaking changes.
+ * @param {boolean} [options.hideIntro] If `true` do not render the intro. 
+ * @param {"web" | "workflow"} [options.projectType] The default is the environment var `SDK_PLATFORM`.
  *
  * @returns {Promise<string>}
  */
-const changelog = async (sourceDir, scriptHeader, breakingOnly = true, projectType = process.env.SDK_PLATFORM) => {
-    const [productVersion, sdkVersion, libraryVersion, reactUiVersion] = getSoftwareVersions(scriptHeader, projectType);
-
-    const [productChangelog, sdkChangelog, libraryChangelog, uiChangelog] = await getChangelogFiles(
-        sourceDir,
-        projectType
+const changelog = async ({
+    sourceDir,
+    banner,
+    breakingOnly,
+    hideIntro,
+    projectType = /** @type {"web" | "workflow"} */ (process.env.SDK_PLATFORM),
+}) => {
+    const sources = await Promise.all(
+        getSources(projectType).map(async ({ name, changelogPath }) => ({
+            name,
+            version: getVersion(banner, name),
+            markdown: await readChangelog(path.join(sourceDir, changelogPath), name),
+        }))
     );
 
-    const productTree = fromMarkdown(productChangelog);
-    const sdkTree = fromMarkdown(sdkChangelog);
-    const libraryTree = fromMarkdown(libraryChangelog);
-    const uiTree = fromMarkdown(uiChangelog);
-
-    const productEntriesByVersion = getChangelogEntriesByVersion(productVersion, projectType, productTree, breakingOnly);
-    const sdkEntriesByVersion = getChangelogEntriesByVersion(sdkVersion, `${projectType}-sdk`, sdkTree, breakingOnly);
-    const libraryEntriesByVersion = getChangelogEntriesByVersion(libraryVersion, "sdk-library", libraryTree, breakingOnly);
-    const uiEntriesByVersion = getChangelogEntriesByVersion(reactUiVersion, "react-ui", uiTree, breakingOnly);
-
-    /**
-     * @type {import("mdast").RootContent[]}
-     */
-    const messages = [
-        {
-            type: "paragraph",
-            children: [
-                {
-                    type: "text",
-                    value: "The target library was built with the following software versions:"
-                }
-            ]
-        },
-        {
-            type: "list",
-            children: [
-                {
-                    type: "listItem",
-                    children: [
-                        {   
-                            type: "paragraph",
-                            children: [
-                                {
-                                    type: "inlineCode",
-                                    value: `[${projectType}]`
-                                },
-                                {
-                                    type: "text",
-                                    value: `: ${productVersion ?? "Unknown"}`
-                                }
-                            ]
-                        },
-                    ]
-                },
-                {
-                    type: "listItem",
-                    children: [
-                        {   
-                            type: "paragraph",
-                            children: [
-                                {
-                                    type: "inlineCode",
-                                    value: `[${projectType}-sdk]`
-                                },
-                                {
-                                    type: "text",
-                                    value: `: ${sdkVersion ?? "Unknown"}`
-                                }
-                            ]
-                        },
-                    ]
-                },
-                {
-                    type: "listItem",
-                    children: [
-                        {   
-                            type: "paragraph",
-                            children: [
-                                {
-                                    type: "inlineCode",
-                                    value: "[sdk-library]"
-                                },
-                                {
-                                    type: "text",
-                                    value: `: ${libraryVersion ?? "Unknown"}`
-                                }
-                            ]
-                        },
-                    ]
-                },
-                (projectType === "web" && ({ 
-                    type: "listItem",
-                    children: [
-                        {  
-                            type: "paragraph",
-                            children: [
-                                {
-                                    type: "inlineCode",
-                                    value: "[react-ui]"
-                                },
-                                {
-                                    type: "text",
-                                    value: `: ${reactUiVersion ?? "Unknown"}`
-                                }
-                            ]
-                        }
-                    ]
-                })),
-            ]
-        },
-        {
-            type: "paragraph",
-            children: [
-                {
-                    type: "text",
-                    value: `Please examine the following ${breakingOnly ? "breaking changes" : "changes"} carefully for ones that affect your project. For software with an unknown version all changes have been included.`
-                }
-            ]
-        },
-    ];
-
-
-    const allChangeItems = [
-        ...productEntriesByVersion.change,
-        ...sdkEntriesByVersion.change,
-        ...libraryEntriesByVersion.change,
-        ...uiEntriesByVersion.change,
-    ].sort(changeItemComparer);
-
-    const allAddItems = [
-        ...productEntriesByVersion.add,
-        ...sdkEntriesByVersion.add,
-        ...libraryEntriesByVersion.add,
-        ...uiEntriesByVersion.add,
-    ].sort(changeItemComparer);
-
-    const allRemoveItems = [
-        ...productEntriesByVersion.remove,
-        ...sdkEntriesByVersion.remove,
-        ...libraryEntriesByVersion.remove,
-        ...uiEntriesByVersion.remove,
-    ].sort(changeItemComparer);
-
-    const allFixItems = [
-        ...productEntriesByVersion.fix,
-        ...sdkEntriesByVersion.fix,
-        ...libraryEntriesByVersion.fix,
-        ...uiEntriesByVersion.fix,
-    ].sort(changeItemComparer);
-
-    /**
-     * @type {import("mdast").RootContent[]}
-     */
-    const changelogMessages = [
-        allChangeItems.length > 0
-            ? {
-                  type: "heading",
-                  depth: 2,
-                  children: [
-                      {
-                          type: "text",
-                          value: "Changed",
-                      },
-                  ],
-              }
-            : undefined,
-        ...allChangeItems.map(change => change.item),
-        allAddItems.length > 0
-            ? {
-                  type: "heading",
-                  depth: 2,
-                  children: [
-                      {
-                          type: "text",
-                          value: "Added",
-                      },
-                  ],
-              }
-            : undefined,
-        ...allAddItems.map(add => add.item),
-        allRemoveItems.length > 0
-            ? {
-                  type: "heading",
-                  depth: 2,
-                  children: [
-                      {
-                          type: "text",
-                          value: "Removed",
-                      },
-                  ],
-              }
-            : undefined,
-        ...allRemoveItems.map(remove => remove.item),
-        allFixItems.length > 0
-            ? {
-                  type: "heading",
-                  depth: 2,
-                  children: [
-                      {
-                          type: "text",
-                          value: "Fixed",
-                      },
-                  ],
-              }
-            : undefined,
-        ...allFixItems.map(fix => fix.item),
-    ];
-
-    const filteredChangelog = changelogMessages.filter(child => !!child)
-
-    if (filteredChangelog.length === 0) {
-        filteredChangelog.push({
-            type: "paragraph",
-            children: [
-                {
-                    type: "emphasis",
-                    children: [
-                        {
-                            type: "text",
-                            value: `No ${breakingOnly ? "breaking changes" : "changes"} found`
-                        }
-                    ]
-                }
-            ]
-        })
-    }
-
-    /**
-     * @type {import("mdast").RootContent[]}
-     */
-    const treeChildren = [
-        {
-            type: "heading",
-            depth: 1,
-            children: [
-                {
-                    type: "text",
-                    value: "Changelog",
-                },
-            ],
-        },
-        ...messages,
-        ...filteredChangelog
-    ];
-
-    /**
-     * @type {import("mdast").Root}
-     */
-    const outputTree = {
-        type: "root",
-        children: treeChildren.filter(child => child !== undefined),
-    };
-
-    return toMarkdown(outputTree);
+    return renderChangelog(sources, breakingOnly, hideIntro);
 };
 
 export default changelog;

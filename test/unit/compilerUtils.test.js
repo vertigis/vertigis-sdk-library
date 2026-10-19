@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it } from '@jest/globals';
 import { Project } from "ts-morph";
 import { getProjectMetadata } from "../../lib/workflow/compilerUtils";
 import InvalidMetatagsError from "../../lib/workflow/InvalidMetatagsError";
@@ -163,6 +164,7 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
+
             expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
                 InvalidMetatagsError
             );
@@ -180,6 +182,7 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
+
             expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
                 InvalidMetatagsError
             );
@@ -201,6 +204,7 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
+
             expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
                 InvalidMetatagsError
             );
@@ -222,6 +226,7 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
+
             expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
                 InvalidMetatagsError
             );
@@ -243,6 +248,7 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
+
             expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
                 InvalidMetatagsError
             );
@@ -264,6 +270,7 @@ describe("getProjectMetadata", () => {
                 }
             }
             `;
+
             expect(() => getProjectMetadata(createSourceFile("index.ts", activitySource), uuid)).toThrow(
                 InvalidMetatagsError
             );

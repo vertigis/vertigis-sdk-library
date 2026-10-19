@@ -17,12 +17,11 @@ const libId = crypto.randomBytes(8).toString("hex");
 let banner = `library id ${libId}
 ${process.env.SDK_PLATFORM} v${process.env.PLATFORM_VERSION} 
 ${process.env.SDK_PLATFORM}-sdk v${process.env.SDK_VERSION}
-sdk-library v${process.env.SDK_LIBRARY_VERSION}
-react-ui v${process.env.REACT_UI_VERSION}`;
+sdk-library v${process.env.SDK_LIBRARY_VERSION}`;
 
 if (process.env.SDK_PLATFORM === "web") {
     banner = `${banner}
-react-ui v${process.env.REACT_UI_VERSION}`
+react-ui v${process.env.REACT_UI_VERSION}`;
 }
 
 const bannerRegExp = new RegExp(libId, "g");

@@ -327,6 +327,27 @@ describe("renderChangelog", () => {
         );
     });
 
+    it("uses the date instead of the built versions if timeRange is set", () => {
+        // The report includes web 5.42.0, which is the built version, because its date is the start date. The report
+        // does not include react-ui 21.11.0, which is newer than the built version, because its date is before the
+        // start date.
+        expect(renderChangelog(webSources, true, false, new Date("2026-06-20"))).toBe(
+            expectedReport(webVersions, "breaking changes", [
+                "## Changed",
+                "",
+                "* `[web]` **Breaking:** rename the `results.display` command (5.44.0)",
+                "* `[web-sdk]` **Breaking:** rename the `build` argument (1.2.0)",
+                "* `[react-ui]` **Breaking:** rename the `onDismiss` prop of `Notification` to `onClose` (21.12.0)",
+                "* `[sdk-library]` **Breaking:** remove the `foo` option (2.1.0)",
+                "* `[web]` **Breaking:** require ArcGIS Maps SDK 4.33 (5.42.0)",
+                "",
+                "## Removed",
+                "",
+                "* `[web]` **Breaking:** remove the deprecated `menu.show` operation (5.43.0)",
+            ])
+        );
+    });
+
     it("ignores the categories that are not in the Common Changelog format", () => {
         const markdown = makeChangelog([
             "### Security",

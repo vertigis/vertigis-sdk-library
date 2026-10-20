@@ -54,8 +54,7 @@ const readChangelog = async (filePath, name) => {
  * @param {string} options.sourceDir The folder that contains the changelogs.
  * @param {string} options.banner The banner comment of the built library.
  * @param {boolean} [options.breakingOnly] If `true` include only the breaking changes.
- * @param {boolean} [options.hideIntro] If `true` do not render the intro. 
- * @param {Date} [options.dateRange] If set use this date as the bound instead of the software versions. In UTC.
+ * @param {Date} [options.startDate] If set use this date to filter entries instead of the software versions.
  * @param {"web" | "workflow"} [options.projectType] The default is the environment var `SDK_PLATFORM`.
  *
  * @returns {Promise<string>}
@@ -64,8 +63,7 @@ const changelog = async ({
     sourceDir,
     banner,
     breakingOnly,
-    hideIntro,
-    dateRange,
+    startDate,
     projectType = /** @type {"web" | "workflow"} */ (process.env.SDK_PLATFORM),
 }) => {
     const sources = await Promise.all(
@@ -76,7 +74,7 @@ const changelog = async ({
         }))
     );
 
-    return renderChangelog(sources, breakingOnly, hideIntro, dateRange);
+    return renderChangelog(sources, breakingOnly, startDate);
 };
 
 export default changelog;

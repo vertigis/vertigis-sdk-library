@@ -8,19 +8,19 @@ import { getVersion, renderChangelog } from "../../lib/shared/changelogUtils.js"
 /**
  * Make the expected report.
  *
- * @param {string[]} versions The lines of the version list.
+ * @param {string[] | string} since The lines of the version list, or the start date in ISO format.
  * @param {string} changeKind `"breaking changes"` or `"changes"`.
  * @param {string[]} body The lines after the intro.
  *
  * @returns {string}
  */
-const expectedReport = (versions, changeKind, body) =>
+const expectedReport = (since, changeKind, body) =>
     [
         "# SDK Changelog",
         "",
-        "This changelog is valid for library code built against these versions:",
-        "",
-        ...versions,
+        ...(typeof since === "string"
+            ? [`This changelog shows all valid entries from ${since} to the present.`]
+            : ["This changelog is valid for library code built against the following versions:", "", ...since]),
         "",
         `Please examine these ${changeKind} carefully for those that may affect your project.`,
         "",
@@ -327,12 +327,12 @@ describe("renderChangelog", () => {
         );
     });
 
-    it("uses the date instead of the built versions if timeRange is set", () => {
+    it("uses the start date instead of the built versions if startDate is set", () => {
         // The report includes web 5.42.0, which is the built version, because its date is the start date. The report
         // does not include react-ui 21.11.0, which is newer than the built version, because its date is before the
         // start date.
-        expect(renderChangelog(webSources, true, false, new Date("2026-06-20"))).toBe(
-            expectedReport(webVersions, "breaking changes", [
+        expect(renderChangelog(webSources, true, new Date("2026-06-20"))).toBe(
+            expectedReport("2026-06-20", "breaking changes", [
                 "## Changed",
                 "",
                 "* `[web]` **Breaking:** rename the `results.display` command (5.44.0)",

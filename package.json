@@ -10,6 +10,7 @@
     "license": "MIT",
     "type": "module",
     "files": [
+        "CHANGELOG.md",
         "config/*.d.ts",
         "config/*.js",
         "config/*.json",
@@ -79,7 +80,7 @@
         "jest": "^30.2.0",
         "p-retry": "^7.0.0",
         "prettier": "~3.5.3",
-        "typescript": "^5.3.3",
+        "typescript": "^6.0.3",
         "webpack-merge": "^6.0.1"
     },
     "overrides": {

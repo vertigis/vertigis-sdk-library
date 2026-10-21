@@ -3,8 +3,11 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 
-import { getVersion, renderChangelog } from "../lib/shared/changelogUtils.js";
+import { extractBannerFromLibrary, getVersion, renderChangelog } from "../lib/shared/changelogUtils.js";
+import paths from "../config/paths.js";
 
 /**
  * @typedef {object} SourceLocation
@@ -47,25 +50,45 @@ const readChangelog = async (filePath, name) => {
 };
 
 /**
- * SDK project changelog script. Make a Markdown report of the changes since the
- * software versions that built a library.
+ * SDK project changelog script. Make a Markdown report of the changes since a
+ * certain time. Control the range returned by supplying either the path to a
+ * previously compiled SDK library or a start date.
  *
- * @param {object} options
- * @param {string} options.sourceDir The folder that contains the changelogs.
- * @param {string} options.banner The banner comment of the built library.
- * @param {boolean} [options.breakingOnly] If `true` include only the breaking changes.
- * @param {Date} [options.startDate] If set use this date to filter entries instead of the software versions.
- * @param {"web" | "workflow"} [options.projectType] The default is the environment var `SDK_PLATFORM`.
+ * @param {string} sourceDir The root directory of the SDK package.
+ * @param {"web" | "workflow"} [projectType] Can also use env var `SDK_PLATFORM`.
  *
  * @returns {Promise<string>}
  */
-const changelog = async ({
-    sourceDir,
-    banner,
-    breakingOnly,
-    startDate,
-    projectType = /** @type {"web" | "workflow"} */ (process.env.SDK_PLATFORM),
-}) => {
+const changelog = async (sourceDir, projectType = /** @type {"web" | "workflow"} */ (process.env.SDK_PLATFORM)) => {
+    const {
+        breakingOnly,
+        path: argsPath,
+        startDate,
+    } = yargs(hideBin(process.argv))
+        .options({ breakingOnly: { type: "boolean" }, path: { type: "string" }, startDate: { type: "string" } })
+        .parseSync();
+
+    // If we don't have a path or a start date, try the default path of
+    // "build/main.js". If we do have a start date we'll just use that.
+    const libraryPath = argsPath
+        ? path.resolve(paths.projRoot, argsPath)
+        : !startDate && path.join(paths.projBuild, "main.js");
+
+    let banner = "";
+    if (libraryPath) {
+        let compiledLibrary = "";
+        try {
+            compiledLibrary = await fs.readFile(libraryPath, "utf-8");
+        } catch {
+            console.error(
+                `Could not find a compiled SDK library at ${libraryPath} and no start date was supplied. Exiting.`
+            );
+            return "";
+        }
+
+        banner = extractBannerFromLibrary(compiledLibrary);
+    }
+
     const sources = await Promise.all(
         getSources(projectType).map(async ({ name, changelogPath }) => ({
             name,
@@ -74,7 +97,7 @@ const changelog = async ({
         }))
     );
 
-    return renderChangelog(sources, breakingOnly, startDate);
+    return renderChangelog(sources, breakingOnly, startDate ? new Date(startDate) : undefined);
 };
 
 export default changelog;

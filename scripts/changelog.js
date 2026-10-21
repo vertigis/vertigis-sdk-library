@@ -6,7 +6,7 @@ import path from "node:path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { extractBannerFromLibrary, getVersion, renderChangelog } from "../lib/shared/changelogUtils.js";
+import { extractBannerFromLibrary, getVersion, isIsoDate, renderChangelog } from "../lib/shared/changelogUtils.js";
 import paths from "../config/paths.js";
 
 /**
@@ -67,6 +67,11 @@ const changelog = async (sourceDir, projectType = /** @type {"web" | "workflow"}
     } = yargs(hideBin(process.argv))
         .options({ breakingOnly: { type: "boolean" }, path: { type: "string" }, startDate: { type: "string" } })
         .parseSync();
+
+    if (startDate && !isIsoDate(startDate)) {
+        console.error(`The start date ${startDate} is not a valid date in the format YYYY-MM-DD. Exiting.`);
+        return "";
+    }
 
     // If we don't have a path or a start date, try the default path of
     // "build/main.js". If we do have a start date we'll just use that.

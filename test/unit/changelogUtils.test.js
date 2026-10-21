@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "@jest/globals";
 
-import { extractBannerFromLibrary, getVersion, renderChangelog } from "../../lib/shared/changelogUtils.js";
+import { extractBannerFromLibrary, getVersion, isIsoDate, renderChangelog } from "../../lib/shared/changelogUtils.js";
 
 /**
  * Make the expected report.
@@ -214,6 +214,17 @@ const workflowSources = [
 ];
 
 const workflowVersions = ["* `[workflow]`: 5.48.2", "* `[workflow-sdk]`: 4.2.0", "* `[sdk-library]`: 2.0.0"];
+
+describe("isIsoDate", () => {
+    it.each([
+        ["an empty value", ""],
+        ["a date with no leading zeros", "2026-6-20"],
+        ["a date in a different format", "06/20/2026"],
+        ["a date with a time", "2026-06-20T00:00:00Z"],
+    ])("rejects %s", (_, value) => {
+        expect(isIsoDate(value)).toBe(false);
+    });
+});
 
 describe("extractBannerFromLibrary", () => {
     // The lines of the banner between "/*!" and " */".

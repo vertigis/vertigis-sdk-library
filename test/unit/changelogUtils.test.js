@@ -311,7 +311,7 @@ describe("getVersion", () => {
 
 describe("renderChangelog", () => {
     it("makes a report of all changes since the built versions", () => {
-        expect(renderChangelog(workflowSources, false)).toBe(
+        expect(renderChangelog({ sources: workflowSources })).toBe(
             expectedReport(workflowVersions, "changes", [
                 "## Changed",
                 "",
@@ -336,7 +336,7 @@ describe("renderChangelog", () => {
     });
 
     it("makes a report of the breaking changes since the built versions", () => {
-        expect(renderChangelog(webSources, true)).toBe(
+        expect(renderChangelog({ sources: webSources, breakingOnly: true })).toBe(
             expectedReport(webVersions, "breaking changes", [
                 "## Changed",
                 "",
@@ -357,7 +357,7 @@ describe("renderChangelog", () => {
         // @ts-ignore
         const unknownVersion = [{ name: "web-sdk", version: undefined, markdown: webSdkChangelog }];
 
-        expect(renderChangelog(unknownVersion, true)).toBe(
+        expect(renderChangelog({ sources: unknownVersion, breakingOnly: true })).toBe(
             expectedReport(["* `[web-sdk]`: unknown"], "breaking changes", [
                 "## Changed",
                 "",
@@ -370,7 +370,7 @@ describe("renderChangelog", () => {
     it("does not include the release of the built version", () => {
         const latestVersion = [{ name: "web-sdk", version: "1.2.0", markdown: webSdkChangelog }];
 
-        expect(renderChangelog(latestVersion, true)).toBe(
+        expect(renderChangelog({ sources: latestVersion, breakingOnly: true })).toBe(
             expectedReport(["* `[web-sdk]`: 1.2.0"], "breaking changes", ["*No breaking changes found*"])
         );
     });
@@ -379,7 +379,7 @@ describe("renderChangelog", () => {
         // The report includes web 5.42.0, which is the built version, because its date is the start date. The report
         // does not include react-ui 21.11.0, which is newer than the built version, because its date is before the
         // start date.
-        expect(renderChangelog(webSources, true, new Date("2026-06-20"))).toBe(
+        expect(renderChangelog({ sources: webSources, breakingOnly: true, startDate: new Date("2026-06-20") })).toBe(
             expectedReport("2026-06-20", "breaking changes", [
                 "## Changed",
                 "",
@@ -407,7 +407,7 @@ describe("renderChangelog", () => {
             "- **Breaking:** rename the `build` argument",
         ]);
 
-        expect(renderChangelog([{ name: "web-sdk", version: "1.0.0", markdown }], true)).toBe(
+        expect(renderChangelog({ sources: [{ name: "web-sdk", version: "1.0.0", markdown }], breakingOnly: true })).toBe(
             expectedReport(["* `[web-sdk]`: 1.0.0"], "breaking changes", [
                 "## Changed",
                 "",
@@ -431,7 +431,7 @@ describe("renderChangelog", () => {
             "[Draft]: https://example.com/draft",
         ]);
 
-        expect(renderChangelog([{ name: "web-sdk", version: "1.0.0", markdown }], true)).toBe(
+        expect(renderChangelog({ sources: [{ name: "web-sdk", version: "1.0.0", markdown }], breakingOnly: true })).toBe(
             expectedReport(["* `[web-sdk]`: 1.0.0"], "breaking changes", [
                 "## Changed",
                 "",

@@ -29,14 +29,18 @@ const expectedReport = (since, changeKind, body) =>
     ].join("\n");
 
 /**
- * Make a changelog with one release, 1.1.0.
+ * Make a changelog with one release.
  *
+ * @param {string} version
+ * @param {string} date The release date in ISO format.
  * @param {string[]} lines The lines of Markdown after the release heading.
  *
  * @returns {string}
  */
-const makeChangelog = lines =>
-    ["## [1.1.0] - 2026-06-01", "", ...lines, "", "[1.1.0]: https://example.com/1.1.0"].join("\n");
+const makeRelease = (version, date, lines) =>
+    [`## [${version}] - ${date}`, "", ...lines, "", `[${version}]: https://example.com/${version}`].join("\n");
+
+
 
 // @vertigis/web does not publish a changelog yet. This test changelog uses the
 // Common Changelog format, like the SDK changelogs.
@@ -397,7 +401,7 @@ describe("renderChangelog", () => {
     });
 
     it("ignores the categories that are not in the Common Changelog format", () => {
-        const markdown = makeChangelog([
+        const markdown = makeRelease("1.1.0", "2026-06-01", [
             "### Security",
             "",
             "- **Breaking:** fix a vulnerability",
@@ -417,7 +421,7 @@ describe("renderChangelog", () => {
     });
 
     it("ignores the items after a release heading that does not have a valid version", () => {
-        const markdown = makeChangelog([
+        const markdown = makeRelease("1.1.0", "2026-06-01", [
             "### Changed",
             "",
             "- **Breaking:** rename the `build` argument",
@@ -436,6 +440,157 @@ describe("renderChangelog", () => {
                 "## Changed",
                 "",
                 "* `[web-sdk]` **Breaking:** rename the `build` argument (1.1.0)",
+            ])
+        );
+    });
+});
+
+describe("renderChangelog with groupByVersionOf", () => {
+    const groupingRule =
+        "The changes are grouped by web version. Each change is in the group of the first web version in this " +
+        "report that was released on or after the day of the change.";
+
+    // Two Web releases after the built version. The newest release has no breaking changes.
+    const web = {
+        name: "web",
+        version: "5.43.0",
+        markdown: [
+            makeRelease("5.45.0", "2026-10-01", ["### Added", "", "- Add the `zoom` command"]),
+            makeRelease("5.44.0", "2026-09-20", [
+                "### Changed",
+                "",
+                "- **Breaking:** rename the `results.display` command",
+            ]),
+        ].join("\n\n"),
+    };
+
+    it("groups the changes by the product releases", () => {
+        // react-ui 21.11.0 is older than web 5.42.0. It is in the group of web
+        // 5.43.0, because the report does not include web 5.42.0.
+        expect(renderChangelog({ sources: webSources, breakingOnly: true, productName: "web" })).toBe(
+            expectedReport(webVersions, "breaking changes", [
+                groupingRule,
+                "",
+                "## web 5.44.0",
+                "",
+                "### Changed",
+                "",
+                "* `[web]` **Breaking:** rename the `results.display` command (5.44.0)",
+                "* `[web-sdk]` **Breaking:** rename the `build` argument (1.2.0)",
+                "* `[react-ui]` **Breaking:** rename the `onDismiss` prop of `Notification` to `onClose` (21.12.0)",
+                "",
+                "## web 5.43.0",
+                "",
+                "### Changed",
+                "",
+                "* `[sdk-library]` **Breaking:** remove the `foo` option (2.1.0)",
+                "",
+                "### Removed",
+                "",
+                "* `[web]` **Breaking:** remove the deprecated `menu.show` operation (5.43.0)",
+                "* `[react-ui]` **Breaking:** remove the `Hidden` component (21.11.0)",
+            ])
+        );
+    });
+
+    it("shows each product release, also a release that has no breaking changes", () => {
+        expect(renderChangelog({ sources: [web], breakingOnly: true, productName: "web" })).toBe(
+            expectedReport(["* `[web]`: 5.43.0"], "breaking changes", [
+                groupingRule,
+                "",
+                "## web 5.45.0",
+                "",
+                "*No breaking changes found*",
+                "",
+                "## web 5.44.0",
+                "",
+                "### Changed",
+                "",
+                "* `[web]` **Breaking:** rename the `results.display` command (5.44.0)",
+            ])
+        );
+    });
+
+    it("puts the changes after the newest product release in a separate group", () => {
+        const library = {
+            name: "sdk-library",
+            version: "2.0.0",
+            markdown: makeRelease("2.1.0", "2026-10-10", [
+                "### Changed",
+                "",
+                "- **Breaking:** remove the `foo` option",
+            ]),
+        };
+
+        expect(renderChangelog({ sources: [web, library], productName: "web" })).toBe(
+            expectedReport(["* `[web]`: 5.43.0", "* `[sdk-library]`: 2.0.0"], "changes", [
+                groupingRule,
+                "",
+                "## After web 5.45.0",
+                "",
+                "### Changed",
+                "",
+                "* `[sdk-library]` **Breaking:** remove the `foo` option (2.1.0)",
+                "",
+                "## web 5.45.0",
+                "",
+                "### Added",
+                "",
+                "* `[web]` Add the `zoom` command (5.45.0)",
+                "",
+                "## web 5.44.0",
+                "",
+                "### Changed",
+                "",
+                "* `[web]` **Breaking:** rename the `results.display` command (5.44.0)",
+            ])
+        );
+    });
+
+    it("puts a change on the day of a product release in the group of that release", () => {
+        const webSdk = {
+            name: "web-sdk",
+            version: "1.0.0",
+            markdown: makeRelease("1.1.0", "2026-09-20", [
+                "### Changed",
+                "",
+                "- **Breaking:** rename the `build` argument",
+            ]),
+        };
+
+        expect(renderChangelog({ sources: [web, webSdk], productName: "web" })).toBe(
+            expectedReport(["* `[web]`: 5.43.0", "* `[web-sdk]`: 1.0.0"], "changes", [
+                groupingRule,
+                "",
+                "## web 5.45.0",
+                "",
+                "### Added",
+                "",
+                "* `[web]` Add the `zoom` command (5.45.0)",
+                "",
+                "## web 5.44.0",
+                "",
+                "### Changed",
+                "",
+                "* `[web]` **Breaking:** rename the `results.display` command (5.44.0)",
+                "* `[web-sdk]` **Breaking:** rename the `build` argument (1.1.0)",
+            ])
+        );
+    });
+
+    it("does not group the changes if the product changelog is missing", () => {
+        expect(renderChangelog({ sources: workflowSources, breakingOnly: true, productName: "workflow" })).toBe(
+            expectedReport(workflowVersions, "breaking changes", [
+                "This report has no workflow releases, so the changes are not grouped by version.",
+                "",
+                "## Changed",
+                "",
+                "* `[workflow-sdk]` **Breaking:** require `@vertigis/workflow` 5.48 or later (5.1.0)",
+                "* `[sdk-library]` **Breaking:** remove the `foo` option (2.1.0)",
+                "",
+                "## Removed",
+                "",
+                "* `[workflow-sdk]` **Breaking:** remove support for `uuid.js` in activity packs (5.0.0)",
             ])
         );
     });

@@ -79,6 +79,7 @@ const getChangelogPath = packageDir => packageDir && path.join(packageDir, "CHAN
 const getSources = async (projectType, sourceDir, tempDir) => {
     // TEST ONLY: remove `getTestProductDir(projectType) ??` when the tests are done.
     const productDir = getTestProductDir(projectType) ?? (await downloadPackage(projectType, "latest", tempDir));
+    // const productDir = await downloadPackage(projectType, "latest", tempDir);
 
     /** @type {SourceLocation[]} */
     const sources = [
@@ -165,15 +166,13 @@ const readSources = async (projectType, sourceDir, banner) => {
 const changelog = async (sourceDir, projectType = /** @type {"web" | "workflow"} */ (process.env.SDK_PLATFORM)) => {
     const {
         breakingOnly,
-        useProductVersions,
         path: argsPath,
         startDate,
     } = yargs(hideBin(process.argv))
-        .options({ 
-            breakingOnly: { type: "boolean" }, 
-            useProductVersions: { type: "boolean" }, 
-            path: { type: "string" }, 
-            startDate: { type: "string" } 
+        .options({
+            breakingOnly: { type: "boolean" },
+            path: { type: "string" },
+            startDate: { type: "string" },
         })
         .parseSync();
 
@@ -205,7 +204,12 @@ const changelog = async (sourceDir, projectType = /** @type {"web" | "workflow"}
 
     const sources = await readSources(projectType, sourceDir, banner);
 
-    return renderChangelog({sources, breakingOnly, useProductVersions, startDate: startDate ? new Date(startDate) : undefined});
+    return renderChangelog({
+        sources,
+        breakingOnly,
+        productName: projectType,
+        startDate: startDate ? new Date(startDate) : undefined,
+    });
 };
 
 export default changelog;

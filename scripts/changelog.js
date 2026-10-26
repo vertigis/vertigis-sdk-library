@@ -7,10 +7,9 @@ import path from "node:path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { getVersion, renderChangelog } from "../lib/shared/changelogUtils.js";
-import { downloadPackage } from "../lib/shared/npmUtils.js";
+import { extractBannerFromLibrary, getVersion, isIsoDate, renderChangelog } from "../lib/shared/changelogUtils.js";
+import { downloadPackage, getDependencyVersions } from "../lib/shared/npmUtils.js";
 import paths from "../config/paths.js";
-import { extractBannerFromLibrary, isIsoDate } from "../lib/shared/regex.js";
 
 /**
  * @typedef {object} SourceLocation
@@ -205,10 +204,14 @@ const changelog = async (sourceDir, projectType = /** @type {"web" | "workflow"}
 
     const sources = await readSources(projectType, sourceDir, banner);
 
+    // Only Web projects use react-ui. Each Web release depends on one react-ui version.
+    const dependencyVersions = projectType === "web" ? { "react-ui": getDependencyVersions("web", "react-ui") } : {};
+
     return renderChangelog({
         sources,
         breakingOnly,
         productName: projectType,
+        dependencyVersions,
         startDate: startDate ? new Date(startDate) : undefined,
     });
 };

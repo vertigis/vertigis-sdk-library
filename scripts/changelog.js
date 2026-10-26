@@ -159,7 +159,8 @@ const readSources = async (projectType, sourceDir, banner) => {
  * previously compiled SDK library or a start date.
  *
  * @param {string} sourceDir The root directory of the SDK package.
- * @param {"web" | "workflow"} [projectType] Can also use env var `SDK_PLATFORM`.
+ * @param {"web" | "workflow"} [projectType] Can also use env var
+ * `SDK_PLATFORM`. MUST be set one way or the other.
  *
  * @returns {Promise<string>}
  */

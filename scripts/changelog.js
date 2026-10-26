@@ -7,9 +7,10 @@ import path from "node:path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { extractBannerFromLibrary, getVersion, isIsoDate, renderChangelog } from "../lib/shared/changelogUtils.js";
+import { getVersion, renderChangelog } from "../lib/shared/changelogUtils.js";
 import { downloadPackage } from "../lib/shared/npmUtils.js";
 import paths from "../config/paths.js";
+import { extractBannerFromLibrary, isIsoDate } from "../lib/shared/regex.js";
 
 /**
  * @typedef {object} SourceLocation

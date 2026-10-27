@@ -39,27 +39,6 @@ const downloadReactUi = async (webDir, tempDir) => {
 };
 
 /**
- * TEST ONLY. Remove this function and its call in `getSources` when the tests
- * are done.
- *
- * Use the Web repo at `../repos/web/`, relative to the project folder, and do
- * not download the Web package.
- *
- * @param {"web" | "workflow"} projectType
- *
- * @returns {string | undefined} The folder of the Web repo, or `undefined` if this is not a Web project.
- */
-const getTestProductDir = projectType => {
-    if (projectType !== "web") {
-        return undefined;
-    }
-
-    const webDir = path.resolve(paths.projRoot, "../../repos/web/");
-    console.error(`TEST ONLY: Using the Web repo at ${webDir}. The Web package is not downloaded.`);
-    return webDir;
-};
-
-/**
  * @param {string | undefined} packageDir
  *
  * @returns {string | undefined} The path of the changelog, or `undefined` if the package is missing.
@@ -77,9 +56,7 @@ const getChangelogPath = packageDir => packageDir && path.join(packageDir, "CHAN
  * @returns {Promise<SourceLocation[]>}
  */
 const getSources = async (projectType, sourceDir, tempDir) => {
-    // TEST ONLY: remove `getTestProductDir(projectType) ??` when the tests are done.
-    const productDir = getTestProductDir(projectType) ?? (await downloadPackage(projectType, "latest", tempDir));
-    // const productDir = await downloadPackage(projectType, "latest", tempDir);
+    const productDir = await downloadPackage(projectType, "latest", tempDir);
 
     /** @type {SourceLocation[]} */
     const sources = [

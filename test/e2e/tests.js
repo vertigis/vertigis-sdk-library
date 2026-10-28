@@ -41,8 +41,7 @@ let success = false;
 /** @returns {Promise<string>} */
 async function getProjectUuid() {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return (await import(pathToFileURL(path.join(process.env.TEST_PROJECT_PATH, "uuid.cjs")).href))
-        .default;
+    return (await import(pathToFileURL(path.join(process.env.TEST_PROJECT_PATH, "uuid.cjs")).href)).default;
 }
 
 /**
@@ -104,9 +103,7 @@ async function testCreateProject() {
         // eslint-disable-next-line @typescript-eslint/no-base-to-string
         processResult.stderr
             .toString()
-            .includes(
-                `Cannot create new project at ${process.env.TEST_PROJECT_PATH} as it already exists`
-            ),
+            .includes(`Cannot create new project at ${process.env.TEST_PROJECT_PATH} as it already exists`),
         true,
         "Failed to detect existing directory"
     );
@@ -127,9 +124,7 @@ async function testBuildProject() {
         "build/main.js is missing"
     );
     assert.strictEqual(
-        fs
-            .readFileSync(path.join(process.env.TEST_PROJECT_PATH, "build/main.js"), "utf-8")
-            .includes("define("),
+        fs.readFileSync(path.join(process.env.TEST_PROJECT_PATH, "build/main.js"), "utf-8").includes("define("),
         true,
         "main.js should be an AMD module (build)"
     );
@@ -187,9 +182,7 @@ async function testGenerate() {
     await pRetry(
         () => {
             assert.strictEqual(
-                fs.existsSync(
-                    path.join(process.env.TEST_PROJECT_PATH, "src/activities/FooName.ts")
-                ),
+                fs.existsSync(path.join(process.env.TEST_PROJECT_PATH, "src/activities/FooName.ts")),
                 true,
                 "Generate activity should create activity module"
             );
@@ -267,9 +260,7 @@ async function testGenerate() {
             assert.strictEqual(
                 fs
                     .readFileSync(path.join(process.env.TEST_PROJECT_PATH, "src/index.ts"), "utf-8")
-                    .includes(
-                        'export { default as BarNameRegistration } from "./elements/BarName";'
-                    ),
+                    .includes('export { default as BarNameRegistration } from "./elements/BarName";'),
                 true,
                 "Generate element should update index.ts exports"
             );
@@ -438,9 +429,7 @@ async function testUpgradeProject() {
     await subprocess;
 
     // Read the package.json file after upgrading.
-    const projectPackage = JSON.parse(
-        await fs.promises.readFile(path.join(projectPath, "package.json"), "utf8")
-    );
+    const projectPackage = JSON.parse(await fs.promises.readFile(path.join(projectPath, "package.json"), "utf8"));
 
     assert.strictEqual(
         projectPackage.devDependencies[`@vertigis/${process.env.SDK_PLATFORM}`],
@@ -459,13 +448,13 @@ async function testUpgradeProject() {
         true,
         "New ESlint configuration should be added."
     );
-    
+
     if (process.env.SDK_PLATFORM === "workflow") {
         assert.strictEqual(
             fs.existsSync(path.join(projectPath, "uuid.cjs")),
             true,
             "Extension of uuid file should be 'cjs'."
-        )
+        );
     }
 
     assert.strictEqual(projectPackage.type, "module", "Project type should be set to 'module'.");
@@ -511,7 +500,5 @@ try {
 try {
     cleanup();
 } catch {
-    console.error(
-        "\n\nFailed to clean up. You may need to remove the 'test-lib' directory manually.\n"
-    );
+    console.error("\n\nFailed to clean up. You may need to remove the 'test-lib' directory manually.\n");
 }

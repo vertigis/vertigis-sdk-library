@@ -23,7 +23,7 @@ const start = (webpackConfig, projectType) => {
     const port = argv["port"] ?? process.env.PORT ?? (isWeb ? 3001 : 5000);
     // Set this to 0.0.0.0 to allow binding to any host.
     const host = argv["host"] ?? "localhost";
-    const serverType = argv["type"] ?? ((host === "localhost" && isWeb) ? "http" : "https");
+    const serverType = argv["type"] ?? (host === "localhost" && isWeb ? "http" : "https");
     const compiler = webpack(webpackConfig);
 
     /**
@@ -46,9 +46,7 @@ const start = (webpackConfig, projectType) => {
         open:
             process.env.SMOKE_TEST !== "true" &&
             process.env.OPEN_BROWSER !== "false" &&
-            (isWeb
-                ? `${serverType}://${host}:${port}${process.env.OPEN_PAGE || ""}`
-                : { target: ["main.js"] }),
+            (isWeb ? `${serverType}://${host}:${port}${process.env.OPEN_PAGE || ""}` : { target: ["main.js"] }),
         port,
         server: {
             type: serverType,

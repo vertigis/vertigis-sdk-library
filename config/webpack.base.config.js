@@ -14,10 +14,15 @@ const isEnvProduction = process.env.NODE_ENV === "production";
 // in the same document, such as Web's runtime and this library's runtime.
 const libId = crypto.randomBytes(8).toString("hex");
 
-const banner = `library id ${libId}
+let banner = `library id ${libId}
 ${process.env.SDK_PLATFORM} v${process.env.PLATFORM_VERSION} 
 ${process.env.SDK_PLATFORM}-sdk v${process.env.SDK_VERSION}
 sdk-library v${process.env.SDK_LIBRARY_VERSION}`;
+
+if (process.env.SDK_PLATFORM === "web") {
+    banner = `${banner}
+react-ui v${process.env.REACT_UI_VERSION}`;
+}
 
 const bannerRegExp = new RegExp(libId, "g");
 
@@ -42,7 +47,7 @@ const baseConfig = {
         // collisions.
         chunkLoadingGlobal: libId,
         library: {
-            type: "amd"
+            type: "amd",
         },
         publicPath: "/",
         path: isEnvProduction ? paths.projBuild : undefined,
@@ -112,14 +117,16 @@ const baseConfig = {
         new webpack.BannerPlugin({ banner }),
     ],
     optimization: {
-        minimizer: [new TerserPlugin({ 
-            extractComments: false,
-            terserOptions: {
-                format: {
-                    comments: bannerRegExp
-                }
-            }
-        })]
+        minimizer: [
+            new TerserPlugin({
+                extractComments: false,
+                terserOptions: {
+                    format: {
+                        comments: bannerRegExp,
+                    },
+                },
+            }),
+        ],
     },
     watchOptions: {
         // Don't bother watching node_modules files for changes. This reduces

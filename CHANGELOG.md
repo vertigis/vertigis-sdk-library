@@ -23,8 +23,8 @@
 
 ### Added
 
-- Add a banner comment with version data to the build output (set environment vars `SDK_PLATFORM`,
-  `PLATFORM_VERSION`, `SDK_VERSION` and `SDK_LIBRARY_VERSION`)
+- Add a banner comment with version data to the build output (set environment vars `SDK_PLATFORM`, `PLATFORM_VERSION`,
+  `SDK_VERSION` and `SDK_LIBRARY_VERSION`)
 
 ## [2.0.5] - 2026-05-19
 
@@ -49,8 +49,7 @@
 
 ### Changed
 
-- **Breaking:** set `module` to `preserve` in the base TypeScript config (needs TypeScript 5.4 or
-  later)
+- **Breaking:** set `module` to `preserve` in the base TypeScript config (needs TypeScript 5.4 or later)
 - Set `typescript` to `^5.4.0` in projects that the `upgrade` script upgrades
 
 ### Added

@@ -59,9 +59,7 @@ const create = (sourceDir, targetName, projectType) => {
 
         if (fs.existsSync(projectPath) && fs.readdirSync(projectPath).length > 0) {
             console.error(
-                chalk.red(
-                    `Cannot create new project at ${chalk.green(projectPath)} as it already exists.\n`
-                )
+                chalk.red(`Cannot create new project at ${chalk.green(projectPath)} as it already exists.\n`)
             );
             process.exit(1);
         }
@@ -80,22 +78,14 @@ const create = (sourceDir, targetName, projectType) => {
 
         // Not keeping these files in the template directory allows the template
         // code to be checked from within this project.
-        copySync(
-            path.join(sourceDir, "config/tsconfig.json.template"),
-            path.join(projectPath, "tsconfig.json"),
-            {
-                errorOnExist: true,
-                overwrite: false,
-            }
-        );
-        copySync(
-            path.join(sourceDir, "config/eslint.config.js.template"),
-            path.join(projectPath, "eslint.config.js"),
-            {
-                errorOnExist: true,
-                overwrite: false,
-            }
-        );
+        copySync(path.join(sourceDir, "config/tsconfig.json.template"), path.join(projectPath, "tsconfig.json"), {
+            errorOnExist: true,
+            overwrite: false,
+        });
+        copySync(path.join(sourceDir, "config/eslint.config.js.template"), path.join(projectPath, "eslint.config.js"), {
+            errorOnExist: true,
+            overwrite: false,
+        });
         // Rename gitignore after the fact to prevent npm from renaming it to .npmignore
         // See: https://github.com/npm/npm/issues/1862
         moveSync(path.join(projectPath, "gitignore"), path.join(projectPath, ".gitignore"));
@@ -107,10 +97,7 @@ const create = (sourceDir, targetName, projectType) => {
     const updateWebTemplateContent = projectPath => {
         const randomNamespace = `custom.${crypto.randomBytes(4).toString("hex")}`;
 
-        const filesToUpdate = [
-            path.join(projectPath, "app/layout.xml"),
-            path.join(projectPath, "src/index.ts"),
-        ];
+        const filesToUpdate = [path.join(projectPath, "app/layout.xml"), path.join(projectPath, "src/index.ts")];
 
         for (const fileToUpdate of filesToUpdate) {
             const contents = fs.readFileSync(fileToUpdate, { encoding: "utf8" });
